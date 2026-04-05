@@ -1,0 +1,32 @@
+pkgname=myfin-player
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Modern Linux music player with Qt Quick UI, local playback and Jellyfin integration"
+arch=('x86_64')
+url="https://example.invalid/myfin"
+license=('MIT')
+depends=('qt6-base' 'qt6-declarative' 'qt6-multimedia')
+makedepends=('cmake' 'ninja')
+source=()
+sha256sums=()
+
+build() {
+  local _repo_root
+  _repo_root="$(realpath "${startdir}/..")"
+
+  cmake -S "${_repo_root}" -B "${srcdir}/build" \
+    -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr
+  cmake --build "${srcdir}/build"
+}
+
+package() {
+  local _repo_root
+  _repo_root="$(realpath "${startdir}/..")"
+
+  DESTDIR="${pkgdir}" cmake --install "${srcdir}/build"
+
+  install -Dm644 "${_repo_root}/packaging/myfin.desktop" \
+    "${pkgdir}/usr/share/applications/myfin.desktop"
+}
