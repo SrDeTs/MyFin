@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=MyFin Player
-Comment=Modern Linux music player with Jellyfin integration
-Exec=myfin
-Terminal=false
-Categories=AudioVideo;Audio;Player;Qt;
-StartupNotify=true
