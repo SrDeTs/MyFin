@@ -5,10 +5,14 @@ Switch {
     id: control
 
     property color accentColor: "#d99f5d"
+    implicitWidth: 46
+    implicitHeight: 28
 
     indicator: Rectangle {
-        implicitWidth: 46
-        implicitHeight: 28
+        x: 0
+        y: 0
+        width: 46
+        height: 28
         radius: 14
         color: control.checked
                ? Qt.rgba(control.accentColor.r, control.accentColor.g, control.accentColor.b, 0.58)
