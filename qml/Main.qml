@@ -184,7 +184,7 @@ ApplicationWindow {
 
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: 132
+            Layout.preferredHeight: 150
             radius: 16
             color: panel
             border.color: borderColor
@@ -267,111 +267,121 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     spacing: 10
 
-                    Button {
-                        id: selectButton
-                        text: conversionManager.selectionMode === 0 ? "Selecionar arquivos" : "Selecionar pasta"
-                        implicitHeight: controlHeight
-                        onClicked: {
-                            if (conversionManager.selectionMode === 0) {
-                                fileDialog.open()
-                            } else {
-                                folderDialog.open()
-                            }
-                        }
-
-                        background: Rectangle {
-                            radius: 10
-                            color: accent
-                        }
-
-                        contentItem: Text {
-                            text: selectButton.text
-                            color: accentText
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            font.pixelSize: 14
-                            font.weight: Font.DemiBold
-                        }
-                    }
-
-                    Button {
-                        id: clearButton
-                        text: "Limpar fila"
-                        enabled: !conversionManager.running
-                        implicitHeight: controlHeight
-                        onClicked: conversionManager.clearQueue()
-
-                        background: Rectangle {
-                            radius: 10
-                            color: clearButton.enabled ? panelSoft : "#1a1f24"
-                            border.color: borderColor
-                            border.width: 1
-                        }
-
-                        contentItem: Text {
-                            text: clearButton.text
-                            color: clearButton.enabled ? textPrimary : "#67747c"
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            font.pixelSize: 14
-                        }
-                    }
-
-                    Item {
+                    RowLayout {
                         Layout.fillWidth: true
-                    }
+                        spacing: 10
 
-                    CheckBox {
-                        id: saveNextToSource
-                        checked: conversionManager.saveNextToSource
-                        Layout.alignment: Qt.AlignVCenter
-                        onToggled: conversionManager.saveNextToSource = checked
+                        Button {
+                            id: selectButton
+                            text: conversionManager.selectionMode === 0 ? "Selecionar arquivos" : "Selecionar pasta"
+                            implicitHeight: controlHeight
+                            onClicked: {
+                                if (conversionManager.selectionMode === 0) {
+                                    fileDialog.open()
+                                } else {
+                                    folderDialog.open()
+                                }
+                            }
 
-                        indicator: Rectangle {
-                            implicitWidth: 18
-                            implicitHeight: 18
-                            radius: 4
-                            border.color: saveNextToSource.checked ? accent : borderColor
-                            border.width: 1
-                            color: saveNextToSource.checked ? accent : panelSoft
+                            background: Rectangle {
+                                radius: 10
+                                color: accent
+                            }
 
-                            Label {
-                                anchors.centerIn: parent
-                                text: saveNextToSource.checked ? "✓" : ""
+                            contentItem: Text {
+                                text: selectButton.text
                                 color: accentText
-                                font.pixelSize: 12
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                font.pixelSize: 14
                                 font.weight: Font.DemiBold
                             }
                         }
 
-                        contentItem: Text {
-                            text: "Salvar ao lado do original"
-                            color: textPrimary
-                            leftPadding: 28
-                            verticalAlignment: Text.AlignVCenter
+                        Button {
+                            id: clearButton
+                            text: "Limpar fila"
+                            enabled: !conversionManager.running
+                            implicitHeight: controlHeight
+                            onClicked: conversionManager.clearQueue()
+
+                            background: Rectangle {
+                                radius: 10
+                                color: clearButton.enabled ? panelSoft : "#1a1f24"
+                                border.color: borderColor
+                                border.width: 1
+                            }
+
+                            contentItem: Text {
+                                text: clearButton.text
+                                color: clearButton.enabled ? textPrimary : "#67747c"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                font.pixelSize: 14
+                            }
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
                         }
                     }
 
-                    Button {
-                        id: outputButton
-                        text: "Pasta de saida"
-                        enabled: !conversionManager.saveNextToSource
-                        implicitHeight: controlHeight
-                        onClicked: outputFolderDialog.open()
+                    RowLayout {
+                        spacing: 10
+                        Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
 
-                        background: Rectangle {
-                            radius: 10
-                            color: outputButton.enabled ? panelSoft : "#1a1f24"
-                            border.color: borderColor
-                            border.width: 1
+                        CheckBox {
+                            id: saveNextToSource
+                            checked: conversionManager.saveNextToSource
+                            Layout.alignment: Qt.AlignVCenter
+                            onToggled: conversionManager.saveNextToSource = checked
+
+                            indicator: Rectangle {
+                                implicitWidth: 18
+                                implicitHeight: 18
+                                radius: 4
+                                border.color: saveNextToSource.checked ? accent : borderColor
+                                border.width: 1
+                                color: saveNextToSource.checked ? accent : panelSoft
+
+                                Label {
+                                    anchors.centerIn: parent
+                                    text: saveNextToSource.checked ? "✓" : ""
+                                    color: accentText
+                                    font.pixelSize: 12
+                                    font.weight: Font.DemiBold
+                                }
+                            }
+
+                            contentItem: Text {
+                                text: "Salvar ao lado do original"
+                                color: textPrimary
+                                leftPadding: 28
+                                verticalAlignment: Text.AlignVCenter
+                            }
                         }
 
-                        contentItem: Text {
-                            text: outputButton.text
-                            color: outputButton.enabled ? textPrimary : "#67747c"
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            font.pixelSize: 14
+                        Button {
+                            id: outputButton
+                            text: "Pasta de saida"
+                            enabled: !conversionManager.saveNextToSource
+                            implicitHeight: controlHeight
+                            onClicked: outputFolderDialog.open()
+
+                            background: Rectangle {
+                                radius: 10
+                                color: outputButton.enabled ? panelSoft : "#1a1f24"
+                                border.color: borderColor
+                                border.width: 1
+                            }
+
+                            contentItem: Text {
+                                text: outputButton.text
+                                color: outputButton.enabled ? textPrimary : "#67747c"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                font.pixelSize: 14
+                            }
                         }
                     }
                 }
@@ -413,13 +423,13 @@ ApplicationWindow {
                     }
 
                     Item {
-                        Layout.fillWidth: false
+                        Layout.fillWidth: true
                     }
 
                     CheckBox {
                         id: overwriteExisting
                         checked: conversionManager.overwriteExisting
-                        Layout.alignment: Qt.AlignTop
+                        Layout.alignment: Qt.AlignVCenter
                         onToggled: conversionManager.overwriteExisting = checked
 
                         indicator: Rectangle {
@@ -617,7 +627,7 @@ ApplicationWindow {
                         text: conversionManager.running ? "Cancelar" : "Converter"
                         implicitHeight: controlHeight
                         implicitWidth: 120
-                        Layout.alignment: Qt.AlignVCenter
+                        Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                         onClicked: {
                             if (conversionManager.running) {
                                 conversionManager.cancelCurrent()
