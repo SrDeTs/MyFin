@@ -12,6 +12,15 @@ cpack -G DEB
 cpack -G RPM
 ```
 
+Ou use o script de release:
+
+```bash
+./packaging/release/build-release.sh
+```
+
+Ele copia o projeto para um caminho temporario sem espacos, gera `.deb`, `.rpm`
+e prepara `dist/AppDir` para AppImage.
+
 ## AppImage
 
 Prepare an AppDir:
