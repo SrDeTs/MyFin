@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Music, Server, User, Lock, ChevronRight } from 'lucide-react';
 import { jellyfin, JellyfinConfig } from '../services/jellyfin';
 import { cn } from '../lib/utils';
+import { isTauri } from '../lib/runtime';
 import { SynesthesiaBackground } from './SynesthesiaBackground';
 import { ThemeSwitch } from './ui/ThemeSwitch';
 
@@ -30,7 +31,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (serverUrl.includes('192.168.') || serverUrl.includes('127.0.0.1') || serverUrl.includes('localhost')) {
+    if (!isTauri() && (serverUrl.includes('192.168.') || serverUrl.includes('127.0.0.1') || serverUrl.includes('localhost'))) {
       setError('IPs locais não funcionam na nuvem. Use uma URL pública (ex: Cloudflare Tunnel ou Ngrok).');
       return;
     }

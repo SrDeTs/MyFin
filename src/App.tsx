@@ -14,6 +14,7 @@ import { AlbumsView } from './components/views/AlbumsView';
 import { ArtistsView } from './components/views/ArtistsView';
 import { FavoritesView } from './components/views/FavoritesView';
 import { PlaylistsView } from './components/views/PlaylistsView';
+import { getGeminiResponse } from './lib/gemini';
 
 // --- Main App ---
 
@@ -275,13 +276,10 @@ export default function App() {
     setIsAiLoading(true);
     setAiInsight(null);
     try {
-      const { GoogleGenAI } = await import("@google/genai");
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `Conte uma curiosidade curta, fascinante e pouco conhecida sobre a música "${currentTrack.Name}" do artista "${currentTrack.ArtistItems[0]?.Name}". Seja direto e use um tom de entusiasta de música.`,
-      });
-      setAiInsight(response.text || "Não consegui encontrar curiosidades sobre esta faixa.");
+      const response = await getGeminiResponse(
+        `Conte uma curiosidade curta, fascinante e pouco conhecida sobre a música "${currentTrack.Name}" do artista "${currentTrack.ArtistItems[0]?.Name}". Seja direto e use um tom de entusiasta de música.`
+      );
+      setAiInsight(response || "Não consegui encontrar curiosidades sobre esta faixa.");
     } catch (error) {
       console.error('AI Error:', error);
       setAiInsight("Ocorreu um erro ao buscar informações da IA.");

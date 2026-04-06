@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getProxyBaseUrl, isTauri } from '../lib/runtime';
 
 export interface JellyfinConfig {
   serverUrl: string;
@@ -46,11 +47,20 @@ export class JellyfinService {
 
   private getProxyUrl(url: string): string {
     if (!url) return '';
-    const baseUrl = window.location.origin;
-    return `${baseUrl}/proxy/jellyfin?url=${encodeURIComponent(url)}`;
+    return `${getProxyBaseUrl()}/proxy/jellyfin?url=${encodeURIComponent(url)}`;
   }
 
   private async request(method: 'get' | 'post' | 'delete', url: string, data?: any, headers?: any) {
+    if (isTauri()) {
+      return await axios({
+        method,
+        url: this.getProxyUrl(url),
+        data,
+        headers,
+        timeout: 15000
+      });
+    }
+
     // Try direct connection first (works if CORS is enabled on server)
     try {
       return await axios({ 
@@ -169,16 +179,17 @@ export class JellyfinService {
 
   getStreamUrl(trackId: string, bitrate?: number): string {
     if (!this.config) return '';
-    if (!bitrate) {
-      return `${this.config.serverUrl}/Audio/${trackId}/stream?static=true&api_key=${this.config.accessToken}`;
-    }
-    // For transcoding, we need more params usually, but bitrate is the key one here
-    return `${this.config.serverUrl}/Audio/${trackId}/stream?audioBitrate=${bitrate * 1000}&api_key=${this.config.accessToken}`;
+    const streamUrl = !bitrate
+      ? `${this.config.serverUrl}/Audio/${trackId}/stream?static=true&api_key=${this.config.accessToken}`
+      : `${this.config.serverUrl}/Audio/${trackId}/stream?audioBitrate=${bitrate * 1000}&api_key=${this.config.accessToken}`;
+
+    return isTauri() ? this.getProxyUrl(streamUrl) : streamUrl;
   }
 
   getAlbumArtUrl(trackId: string, maxWidth = 400): string {
     if (!this.config) return '';
-    return `${this.config.serverUrl}/Items/${trackId}/Images/Primary?maxWidth=${maxWidth}&quality=90`;
+    const imageUrl = `${this.config.serverUrl}/Items/${trackId}/Images/Primary?maxWidth=${maxWidth}&quality=90&api_key=${this.config.accessToken}`;
+    return isTauri() ? this.getProxyUrl(imageUrl) : imageUrl;
   }
 
   async getFavorites(): Promise<Track[]> {

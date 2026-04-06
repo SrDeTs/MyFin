@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
+    "dev:tauri": "vite --host 127.0.0.1 --port 1420",
     "build": "vite build",
     "preview": "vite preview",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
   },
@@ -16,6 +19,7 @@
     "@fontsource/space-grotesk": "^5.2.10",
     "@google/genai": "^1.29.0",
     "@tailwindcss/vite": "^4.1.14",
+    "@tauri-apps/api": "^2.10.1",
     "@vitejs/plugin-react": "^5.0.4",
     "axios": "^1.14.0",
     "clsx": "^2.1.1",
@@ -31,6 +35,7 @@
     "vite": "^6.2.0"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.10.1",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.4.21",
