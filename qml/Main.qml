@@ -109,22 +109,44 @@ ApplicationWindow {
                 anchors.margins: 16
                 spacing: 16
 
-                ColumnLayout {
+                RowLayout {
                     Layout.fillWidth: true
-                    spacing: 4
+                    spacing: 14
 
-                    Label {
-                        text: "Resolve Media Converter"
-                        color: textPrimary
-                        font.pixelSize: 28
-                        font.weight: Font.DemiBold
+                    Rectangle {
+                        Layout.preferredWidth: 56
+                        Layout.preferredHeight: 56
+                        radius: 12
+                        color: panelSoft
+                        border.color: borderColor
+
+                        Image {
+                            anchors.fill: parent
+                            anchors.margins: 8
+                            source: "qrc:/qt/qml/ResolveMediaConverter/Logo.png"
+                            fillMode: Image.PreserveAspectFit
+                            smooth: true
+                            mipmap: true
+                        }
                     }
 
-                    Label {
+                    ColumnLayout {
                         Layout.fillWidth: true
-                        text: "Mantem o video intacto e converte somente o audio para FLAC."
-                        color: textMuted
-                        wrapMode: Text.Wrap
+                        spacing: 4
+
+                        Label {
+                            text: "Resolve Media Converter"
+                            color: textPrimary
+                            font.pixelSize: 28
+                            font.weight: Font.DemiBold
+                        }
+
+                        Label {
+                            Layout.fillWidth: true
+                            text: "Mantem o video intacto e converte somente o audio para FLAC."
+                            color: textMuted
+                            wrapMode: Text.Wrap
+                        }
                     }
                 }
 

@@ -4,6 +4,7 @@
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QGuiApplication>
+#include <QIcon>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQuickStyle>
@@ -62,6 +63,7 @@ int main(int argc, char *argv[])
     app.setApplicationVersion(QString::fromLatin1(kAppVersion));
     app.setOrganizationName(QStringLiteral("Codex"));
     app.setOrganizationDomain(QStringLiteral("local.codex"));
+    app.setWindowIcon(QIcon(QStringLiteral(":/qt/qml/ResolveMediaConverter/Logo.png")));
 
     QCommandLineParser parser;
     parser.setApplicationDescription(QStringLiteral("Resolve Media Converter: corrige incompatibilidades de audio para o DaVinci Resolve no Linux."));

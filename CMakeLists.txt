@@ -24,6 +24,8 @@ qt_add_qml_module(resolve-media-converter
     VERSION 1.0
     QML_FILES
         qml/Main.qml
+    RESOURCES
+        Logo.png
 )
 
 target_include_directories(resolve-media-converter
