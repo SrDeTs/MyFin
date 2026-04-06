@@ -49,6 +49,9 @@ public:
     bool overwriteExisting() const;
     void setOverwriteExisting(bool enabled);
 
+    bool verboseLogging() const;
+    void setVerboseLogging(bool enabled);
+
     int selectionMode() const;
     void setSelectionMode(int mode);
 
@@ -97,5 +100,6 @@ private:
     bool m_running = false;
     bool m_saveNextToSource = true;
     bool m_overwriteExisting = false;
+    bool m_verboseLogging = false;
     int m_selectionMode = FilesMode;
 };

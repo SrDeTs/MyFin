@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QFileInfo>
+#include <QLoggingCategory>
 
 ConversionManager::ConversionManager(QObject *parent)
     : QObject(parent)
@@ -116,6 +117,16 @@ void ConversionManager::setOverwriteExisting(bool enabled)
 
     m_overwriteExisting = enabled;
     emit overwriteExistingChanged();
+}
+
+bool ConversionManager::verboseLogging() const
+{
+    return m_verboseLogging;
+}
+
+void ConversionManager::setVerboseLogging(bool enabled)
+{
+    m_verboseLogging = enabled;
 }
 
 int ConversionManager::selectionMode() const
@@ -313,6 +324,9 @@ QString ConversionManager::buildOutputPath(const QString &sourcePath) const
 void ConversionManager::log(const QString &message)
 {
     m_logModel.append(message);
+    if (m_verboseLogging) {
+        qInfo().noquote() << message;
+    }
 }
 
 void ConversionManager::startNextPending()
