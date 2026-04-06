@@ -1,0 +1,5 @@
+{
+  "name": "MyFin",
+  "description": "An immersive, fluid music player for Jellyfin libraries with a focus on organic visuals and seamless interaction.",
+  "requestFramePermissions": []
+}
