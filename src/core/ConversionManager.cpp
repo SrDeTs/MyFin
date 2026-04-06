@@ -137,7 +137,7 @@ void ConversionManager::addFiles(const QStringList &paths)
 {
     int added = 0;
     for (const QString &path : paths) {
-        if (!isSupportedVideoFile(path)) {
+        if (!isSupportedInputFile(path)) {
             log(QStringLiteral("Ignorado por formato nao suportado: %1").arg(path));
             continue;
         }
@@ -270,11 +270,39 @@ bool ConversionManager::isSupportedVideoFile(const QString &path)
     return supported.contains(suffix);
 }
 
+bool ConversionManager::isSupportedAudioFile(const QString &path)
+{
+    const QString suffix = QFileInfo(path).suffix().toLower();
+    static const QSet<QString> supported{
+        QStringLiteral("wav"),
+        QStringLiteral("mp3"),
+        QStringLiteral("aac"),
+        QStringLiteral("m4a"),
+        QStringLiteral("flac"),
+        QStringLiteral("opus"),
+        QStringLiteral("ogg"),
+        QStringLiteral("aif"),
+        QStringLiteral("aiff")
+    };
+    return supported.contains(suffix);
+}
+
+bool ConversionManager::isSupportedInputFile(const QString &path) const
+{
+    if (m_selectionMode == AudioMode) {
+        return isSupportedAudioFile(path);
+    }
+
+    return isSupportedVideoFile(path);
+}
+
 QString ConversionManager::buildOutputPath(const QString &sourcePath) const
 {
     const QFileInfo info(sourcePath);
     const QString baseName = info.completeBaseName();
-    const QString outputName = QStringLiteral("%1_resolve.flacfix.mkv").arg(baseName);
+    const QString outputName = (m_selectionMode == AudioMode || isSupportedAudioFile(sourcePath))
+        ? QStringLiteral("%1_resolve.flac").arg(baseName)
+        : QStringLiteral("%1_resolve.flacfix.mkv").arg(baseName);
     if (m_saveNextToSource || m_outputDirectory.isEmpty()) {
         return info.dir().filePath(outputName);
     }

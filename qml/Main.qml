@@ -63,9 +63,11 @@ ApplicationWindow {
 
     FileDialog {
         id: fileDialog
-        title: "Selecionar videos"
+        title: conversionManager.selectionMode === 2 ? "Selecionar audios" : "Selecionar videos"
         fileMode: FileDialog.OpenFiles
-        nameFilters: ["Videos (*.mp4 *.mkv *.mov *.webm *.avi)"]
+        nameFilters: conversionManager.selectionMode === 2
+                     ? ["Audios (*.wav *.mp3 *.aac *.m4a *.flac *.opus *.ogg *.aif *.aiff)"]
+                     : ["Videos (*.mp4 *.mkv *.mov *.webm *.avi)"]
         onAccepted: conversionManager.addFiles(selectedFiles.map(url => decodeURIComponent(url.toString().substring(7))))
     }
 
@@ -213,7 +215,7 @@ ApplicationWindow {
                         radius: 12
                         color: panelSoft
                         border.color: borderColor
-                        implicitWidth: 190
+                        implicitWidth: 286
                         implicitHeight: 40
 
                         RowLayout {
@@ -222,7 +224,7 @@ ApplicationWindow {
                             spacing: 4
 
                             Repeater {
-                                model: ["Arquivos", "Pasta"]
+                                model: ["Arquivos", "Pasta", "Audio Solo"]
 
                                 delegate: Button {
                                     id: modeButton
@@ -258,7 +260,9 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     text: conversionManager.selectionMode === 0
                           ? "Adicione um ou mais videos. Tambem funciona com drag and drop."
-                          : "Selecione uma pasta para importar os videos suportados."
+                          : conversionManager.selectionMode === 1
+                            ? "Selecione uma pasta para importar os videos suportados."
+                            : "Adicione arquivos de audio para converter direto para FLAC."
                     color: textMuted
                     wrapMode: Text.Wrap
                 }
@@ -271,17 +275,17 @@ ApplicationWindow {
                         Layout.fillWidth: true
                         spacing: 10
 
-                        Button {
-                            id: selectButton
-                            text: conversionManager.selectionMode === 0 ? "Selecionar arquivos" : "Selecionar pasta"
-                            implicitHeight: controlHeight
-                            onClicked: {
-                                if (conversionManager.selectionMode === 0) {
-                                    fileDialog.open()
-                                } else {
-                                    folderDialog.open()
-                                }
+                    Button {
+                        id: selectButton
+                        text: conversionManager.selectionMode === 1 ? "Selecionar pasta" : "Selecionar arquivos"
+                        implicitHeight: controlHeight
+                        onClicked: {
+                            if (conversionManager.selectionMode === 1) {
+                                folderDialog.open()
+                            } else {
+                                fileDialog.open()
                             }
+                        }
 
                             background: Rectangle {
                                 radius: 10
@@ -330,34 +334,42 @@ ApplicationWindow {
                         spacing: 10
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
 
-                        CheckBox {
-                            id: saveNextToSource
+                        Button {
+                            id: saveNextToSourceToggle
+                            checkable: true
                             checked: conversionManager.saveNextToSource
-                            Layout.alignment: Qt.AlignVCenter
+                            implicitHeight: controlHeight
                             onToggled: conversionManager.saveNextToSource = checked
 
-                            indicator: Rectangle {
-                                implicitWidth: 18
-                                implicitHeight: 18
-                                radius: 4
-                                border.color: saveNextToSource.checked ? accent : borderColor
-                                border.width: 1
-                                color: saveNextToSource.checked ? accent : panelSoft
+                            background: Item {}
+
+                            contentItem: RowLayout {
+                                spacing: 10
+
+                                Rectangle {
+                                    Layout.alignment: Qt.AlignVCenter
+                                    implicitWidth: 18
+                                    implicitHeight: 18
+                                    radius: 4
+                                    border.color: saveNextToSourceToggle.checked ? accent : borderColor
+                                    border.width: 1
+                                    color: saveNextToSourceToggle.checked ? accent : panelSoft
+
+                                    Label {
+                                        anchors.centerIn: parent
+                                        text: saveNextToSourceToggle.checked ? "✓" : ""
+                                        color: accentText
+                                        font.pixelSize: 12
+                                        font.weight: Font.DemiBold
+                                    }
+                                }
 
                                 Label {
-                                    anchors.centerIn: parent
-                                    text: saveNextToSource.checked ? "✓" : ""
-                                    color: accentText
-                                    font.pixelSize: 12
-                                    font.weight: Font.DemiBold
+                                    Layout.alignment: Qt.AlignVCenter
+                                    text: "Salvar ao lado do original"
+                                    color: textPrimary
+                                    font.pixelSize: 14
                                 }
-                            }
-
-                            contentItem: Text {
-                                text: "Salvar ao lado do original"
-                                color: textPrimary
-                                leftPadding: 28
-                                verticalAlignment: Text.AlignVCenter
                             }
                         }
 
@@ -426,34 +438,43 @@ ApplicationWindow {
                         Layout.fillWidth: true
                     }
 
-                    CheckBox {
-                        id: overwriteExisting
+                    Button {
+                        id: overwriteExistingToggle
+                        checkable: true
                         checked: conversionManager.overwriteExisting
+                        implicitHeight: controlHeight
                         Layout.alignment: Qt.AlignVCenter
                         onToggled: conversionManager.overwriteExisting = checked
 
-                        indicator: Rectangle {
-                            implicitWidth: 18
-                            implicitHeight: 18
-                            radius: 4
-                            border.color: overwriteExisting.checked ? accent : borderColor
-                            border.width: 1
-                            color: overwriteExisting.checked ? accent : panelSoft
+                        background: Item {}
+
+                        contentItem: RowLayout {
+                            spacing: 10
+
+                            Rectangle {
+                                Layout.alignment: Qt.AlignVCenter
+                                implicitWidth: 18
+                                implicitHeight: 18
+                                radius: 4
+                                border.color: overwriteExistingToggle.checked ? accent : borderColor
+                                border.width: 1
+                                color: overwriteExistingToggle.checked ? accent : panelSoft
+
+                                Label {
+                                    anchors.centerIn: parent
+                                    text: overwriteExistingToggle.checked ? "✓" : ""
+                                    color: accentText
+                                    font.pixelSize: 12
+                                    font.weight: Font.DemiBold
+                                }
+                            }
 
                             Label {
-                                anchors.centerIn: parent
-                                text: overwriteExisting.checked ? "✓" : ""
-                                color: accentText
-                                font.pixelSize: 12
-                                font.weight: Font.DemiBold
+                                Layout.alignment: Qt.AlignVCenter
+                                text: "Sobrescrever existentes"
+                                color: textPrimary
+                                font.pixelSize: 14
                             }
-                        }
-
-                        contentItem: Text {
-                            text: "Sobrescrever existentes"
-                            color: textPrimary
-                            leftPadding: 28
-                            verticalAlignment: Text.AlignVCenter
                         }
                     }
                 }
@@ -620,6 +641,10 @@ ApplicationWindow {
                             text: "Compatibilidade com Resolve no Linux, sem mexer no video."
                             color: textMuted
                         }
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
                     }
 
                     Button {

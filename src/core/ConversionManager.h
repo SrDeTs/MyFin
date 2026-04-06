@@ -24,7 +24,8 @@ class ConversionManager : public QObject
 public:
     enum SelectionMode {
         FilesMode = 0,
-        FolderMode = 1
+        FolderMode = 1,
+        AudioMode = 2
     };
     Q_ENUM(SelectionMode)
 
@@ -81,6 +82,8 @@ private slots:
 
 private:
     static bool isSupportedVideoFile(const QString &path);
+    static bool isSupportedAudioFile(const QString &path);
+    bool isSupportedInputFile(const QString &path) const;
     QString buildOutputPath(const QString &sourcePath) const;
     void log(const QString &message);
     void startNextPending();
