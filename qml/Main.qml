@@ -24,6 +24,7 @@ ApplicationWindow {
     readonly property color accentText: "#0b1209"
     readonly property color error: "#da726a"
     readonly property color warning: "#d8ba6b"
+    readonly property int controlHeight: 38
 
     function addDroppedUrls(urls) {
         const paths = []
@@ -269,6 +270,7 @@ ApplicationWindow {
                     Button {
                         id: selectButton
                         text: conversionManager.selectionMode === 0 ? "Selecionar arquivos" : "Selecionar pasta"
+                        implicitHeight: controlHeight
                         onClicked: {
                             if (conversionManager.selectionMode === 0) {
                                 fileDialog.open()
@@ -296,6 +298,7 @@ ApplicationWindow {
                         id: clearButton
                         text: "Limpar fila"
                         enabled: !conversionManager.running
+                        implicitHeight: controlHeight
                         onClicked: conversionManager.clearQueue()
 
                         background: Rectangle {
@@ -321,6 +324,7 @@ ApplicationWindow {
                     CheckBox {
                         id: saveNextToSource
                         checked: conversionManager.saveNextToSource
+                        Layout.alignment: Qt.AlignVCenter
                         onToggled: conversionManager.saveNextToSource = checked
 
                         indicator: Rectangle {
@@ -352,6 +356,7 @@ ApplicationWindow {
                         id: outputButton
                         text: "Pasta de saida"
                         enabled: !conversionManager.saveNextToSource
+                        implicitHeight: controlHeight
                         onClicked: outputFolderDialog.open()
 
                         background: Rectangle {
@@ -388,27 +393,33 @@ ApplicationWindow {
 
                 RowLayout {
                     Layout.fillWidth: true
+                    spacing: 12
 
-                    Label {
-                        text: "Fila"
-                        color: textPrimary
-                        font.pixelSize: 20
-                        font.weight: Font.DemiBold
-                    }
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 4
 
-                    Label {
-                        text: "O video e copiado sem reencodar. Apenas o audio vai para FLAC."
-                        color: textMuted
-                        Layout.leftMargin: 12
+                        Label {
+                            text: "Fila"
+                            color: textPrimary
+                            font.pixelSize: 20
+                            font.weight: Font.DemiBold
+                        }
+
+                        Label {
+                            text: "O video e copiado sem reencodar. Apenas o audio vai para FLAC."
+                            color: textMuted
+                        }
                     }
 
                     Item {
-                        Layout.fillWidth: true
+                        Layout.fillWidth: false
                     }
 
                     CheckBox {
                         id: overwriteExisting
                         checked: conversionManager.overwriteExisting
+                        Layout.alignment: Qt.AlignTop
                         onToggled: conversionManager.overwriteExisting = checked
 
                         indicator: Rectangle {
@@ -582,6 +593,7 @@ ApplicationWindow {
 
                 RowLayout {
                     Layout.fillWidth: true
+                    spacing: 12
 
                     ColumnLayout {
                         Layout.fillWidth: true
@@ -603,6 +615,9 @@ ApplicationWindow {
                     Button {
                         id: convertButton
                         text: conversionManager.running ? "Cancelar" : "Converter"
+                        implicitHeight: controlHeight
+                        implicitWidth: 120
+                        Layout.alignment: Qt.AlignVCenter
                         onClicked: {
                             if (conversionManager.running) {
                                 conversionManager.cancelCurrent()
