@@ -11,7 +11,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2)
 
 qt_standard_project_setup(REQUIRES 6.5)
-qt_policy(SET QTP0004 NEW)
+if(POLICY QTP0004)
+    qt_policy(SET QTP0004 NEW)
+endif()
 
 qt_add_executable(resolve-media-converter
     src/main.cpp
@@ -50,7 +52,7 @@ install(TARGETS resolve-media-converter
 )
 
 install(FILES
-    Logo.png
+    packaging/linux/io.github.srdets.ResolveMediaConverter.png
     DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps
     RENAME io.github.srdets.ResolveMediaConverter.png
 )
