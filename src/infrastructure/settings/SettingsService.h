@@ -27,6 +27,9 @@ public:
     QString userId() const;
     void setUserId(const QString& value);
 
+    QString sessionToken() const;
+    void setSessionToken(const QString& value);
+
     QString deviceId() const;
     void setDeviceId(const QString& value);
 

@@ -287,13 +287,21 @@ void JellyfinApiClient::login(const QString& serverUrl, const QString& username,
         if (m_settings.serverName().trimmed().isEmpty() || m_settings.serverName().trimmed() == QStringLiteral("Demo Jellyfin")) {
             m_settings.setServerName(normalizedUrl.host());
         }
+        bool persistedSecurely = false;
         if (!m_secretStore.isAvailable()) {
-            qInfo(lcJellyfin) << "Secret store not available; session token will remain in memory only";
+            qInfo(lcJellyfin) << "Secret store not available; persisting session token in local settings fallback";
         } else {
             const QString accountKey = secretAccountKey(normalizedUrl, userId);
-            if (!m_secretStore.storeToken(accountKey, accessToken)) {
-                qWarning(lcJellyfin) << "Failed to persist Jellyfin access token in the secret store";
+            persistedSecurely = m_secretStore.storeToken(accountKey, accessToken);
+            if (!persistedSecurely) {
+                qWarning(lcJellyfin) << "Failed to persist Jellyfin access token in the secret store; using local settings fallback";
             }
+        }
+
+        if (persistedSecurely) {
+            m_settings.setSessionToken({});
+        } else {
+            m_settings.setSessionToken(accessToken);
         }
 
         qInfo(lcJellyfin) << "Authenticated against" << normalizedUrl << "as user" << userName;
@@ -315,6 +323,7 @@ void JellyfinApiClient::logout()
     m_accessToken.clear();
     m_serverProfile.userId.clear();
     m_settings.setUserId({});
+    m_settings.setSessionToken({});
     setState(ConnectionState::Disconnected);
     setLastError({});
     emit sessionChanged();
@@ -555,23 +564,31 @@ void JellyfinApiClient::restorePersistedSession()
         return;
     }
 
-    if (!m_secretStore.isAvailable()) {
-        return;
+    QString restoredToken;
+
+    if (m_secretStore.isAvailable()) {
+        const QString accountKey = secretAccountKey(m_serverProfile.baseUrl, m_serverProfile.userId);
+        if (!accountKey.isEmpty()) {
+            restoredToken = m_secretStore.readToken(accountKey);
+            if (!restoredToken.isEmpty()) {
+                qInfo(lcJellyfin) << "Restored Jellyfin session token from Secret Service for" << m_serverProfile.baseUrl;
+            }
+        }
     }
 
-    const QString accountKey = secretAccountKey(m_serverProfile.baseUrl, m_serverProfile.userId);
-    if (accountKey.isEmpty()) {
-        return;
+    if (restoredToken.isEmpty()) {
+        restoredToken = m_settings.sessionToken();
+        if (!restoredToken.isEmpty()) {
+            qWarning(lcJellyfin) << "Restored Jellyfin session token from local settings fallback";
+        }
     }
 
-    const QString restoredToken = m_secretStore.readToken(accountKey);
     if (restoredToken.isEmpty()) {
         return;
     }
 
     m_accessToken = restoredToken;
     setState(ConnectionState::Connected);
-    qInfo(lcJellyfin) << "Restored Jellyfin session token from Secret Service for" << m_serverProfile.baseUrl;
 }
 
 QUrl JellyfinApiClient::buildServerRelativeUrl(const QString& path, const QUrlQuery& query) const

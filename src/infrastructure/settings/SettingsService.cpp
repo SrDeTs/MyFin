@@ -66,6 +66,17 @@ void SettingsService::setUserId(const QString& value)
     settings().setValue(key(QStringLiteral("server/userId")), value);
 }
 
+QString SettingsService::sessionToken() const
+{
+    return settings().value(key(QStringLiteral("session/accessToken"))).toString();
+}
+
+void SettingsService::setSessionToken(const QString& value)
+{
+    settings().setValue(key(QStringLiteral("session/accessToken")), value);
+    settings().sync();
+}
+
 QString SettingsService::deviceId() const
 {
     return settings().value(key(QStringLiteral("session/deviceId"))).toString();
