@@ -14,7 +14,7 @@ Rectangle {
     border.color: theme.stroke
 
     implicitHeight: 128
-    readonly property int controlClusterWidth: 210
+    readonly property int volumeClusterWidth: 156
 
     function controlBgColor(enabled, highlighted, hovered) {
         if (!enabled) {
@@ -41,6 +41,25 @@ Rectangle {
             return "\uD83D\uDD08"
         }
         return "\uD83D\uDD0A"
+    }
+
+    component SmallTransportButton: ToolButton {
+        leftPadding: 0
+        rightPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        implicitWidth: 40
+        implicitHeight: 40
+        property bool accentActive: false
+
+        background: Rectangle {
+            implicitWidth: 40
+            implicitHeight: 40
+            radius: 20
+            color: root.controlBgColor(parent.enabled, parent.accentActive, parent.hovered)
+            border.width: 1
+            border.color: parent.accentActive ? theme.accentStrong : theme.stroke
+        }
     }
 
     ColumnLayout {
@@ -87,24 +106,98 @@ Rectangle {
                 Layout.preferredHeight: 64
 
                 Text {
-                    anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
-                    anchors.right: parent.right
+                    anchors.right: controlGroup.left
+                    anchors.rightMargin: 18
+                    anchors.verticalCenter: parent.verticalCenter
                     text: playback.hasTrack ? playback.title : "Nada tocando"
                     color: theme.text
                     font.pixelSize: 18
                     font.weight: Font.Black
                     elide: Text.ElideRight
                 }
-            }
 
-            RowLayout {
-                Layout.preferredWidth: root.controlClusterWidth
-                Layout.alignment: Qt.AlignRight
-                spacing: 8
+                Row {
+                    id: controlGroup
+                    anchors.centerIn: parent
+                    spacing: 8
 
-                ToolButton {
-                    id: repeatButton
+                    SmallTransportButton {
+                        id: previousButton
+                        enabled: playback.canGoPrevious
+                        hoverEnabled: enabled
+                        onClicked: playback.previous()
+
+                        contentItem: Image {
+                            anchors.centerIn: parent
+                            width: 18
+                            height: 18
+                            sourceSize.width: 18
+                            sourceSize.height: 18
+                            source: "qrc:/qt/qml/MyFin/src/ui/qml/assets/icons/previous.svg"
+                            opacity: previousButton.enabled ? 1.0 : 0.38
+                        }
+                    }
+
+                    ToolButton {
+                        id: playButton
+                        enabled: playback.hasTrack
+                        hoverEnabled: enabled
+                        onClicked: playback.togglePlaying()
+                        leftPadding: 0
+                        rightPadding: 0
+                        topPadding: 0
+                        bottomPadding: 0
+
+                        background: Rectangle {
+                            implicitWidth: 58
+                            implicitHeight: 58
+                            radius: 29
+                            color: root.controlBgColor(playButton.enabled, true, playButton.hovered)
+                            border.width: 1
+                            border.color: theme.stroke
+                        }
+
+                        contentItem: Item {
+                            implicitWidth: 28
+                            implicitHeight: 28
+
+                            Image {
+                                anchors.centerIn: parent
+                                width: 24
+                                height: 24
+                                sourceSize.width: 24
+                                sourceSize.height: 24
+                                source: playback.playing
+                                        ? "qrc:/qt/qml/MyFin/src/ui/qml/assets/icons/pause.svg"
+                                        : "qrc:/qt/qml/MyFin/src/ui/qml/assets/icons/play.svg"
+                                opacity: playButton.enabled ? 1.0 : 0.38
+                            }
+                        }
+                    }
+
+                    SmallTransportButton {
+                        id: nextButton
+                        enabled: playback.canGoNext
+                        hoverEnabled: enabled
+                        onClicked: playback.next()
+
+                        contentItem: Image {
+                            anchors.centerIn: parent
+                            width: 18
+                            height: 18
+                            sourceSize.width: 18
+                            sourceSize.height: 18
+                            source: "qrc:/qt/qml/MyFin/src/ui/qml/assets/icons/next.svg"
+                            opacity: nextButton.enabled ? 1.0 : 0.38
+                        }
+                    }
+                }
+
+                    ToolButton {
+                        id: repeatButton
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
                     enabled: playback.hasTrack
                     hoverEnabled: enabled
                     onClicked: playback.toggleRepeatCurrent()
@@ -112,153 +205,43 @@ Rectangle {
                     rightPadding: 0
                     topPadding: 0
                     bottomPadding: 0
+                    implicitWidth: 36
+                    implicitHeight: 36
 
                     background: Rectangle {
-                        implicitWidth: 40
-                        implicitHeight: 40
-                        radius: 20
+                        implicitWidth: 36
+                        implicitHeight: 36
+                        radius: 18
                         color: root.controlBgColor(repeatButton.enabled, playback.repeatCurrent, repeatButton.hovered)
                         border.width: 1
                         border.color: playback.repeatCurrent ? theme.accentStrong : theme.stroke
                     }
 
-                    contentItem: Text {
-                        text: "1x"
-                        color: root.controlFgColor(repeatButton.enabled, playback.repeatCurrent)
-                        font.pixelSize: 12
-                        font.weight: Font.Black
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                }
-
-                ToolButton {
-                    id: previousButton
-                    enabled: playback.canGoPrevious
-                    hoverEnabled: enabled
-                    onClicked: playback.previous()
-                    leftPadding: 0
-                    rightPadding: 0
-                    topPadding: 0
-                    bottomPadding: 0
-
-                    background: Rectangle {
-                        implicitWidth: 40
-                        implicitHeight: 40
-                        radius: 20
-                        color: root.controlBgColor(previousButton.enabled, false, previousButton.hovered)
-                        border.width: 1
-                        border.color: theme.stroke
-                    }
-
-                    contentItem: Text {
-                        text: "\u23EE"
-                        color: root.controlFgColor(previousButton.enabled, false)
-                        font.pixelSize: 16
-                        font.weight: Font.Black
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                }
-
-                ToolButton {
-                    id: playButton
-                    enabled: playback.hasTrack
-                    hoverEnabled: enabled
-                    onClicked: playback.togglePlaying()
-                    leftPadding: 0
-                    rightPadding: 0
-                    topPadding: 0
-                    bottomPadding: 0
-
-                    background: Rectangle {
-                        implicitWidth: 58
-                        implicitHeight: 58
-                        radius: 29
-                        color: root.controlBgColor(playButton.enabled, true, playButton.hovered)
-                        border.width: 1
-                        border.color: theme.stroke
-                    }
-
                     contentItem: Item {
-                        implicitWidth: 28
-                        implicitHeight: 28
+                        implicitWidth: 18
+                        implicitHeight: 18
 
-                        Canvas {
-                            id: playGlyph
+                        Image {
                             anchors.centerIn: parent
-                            width: 24
-                            height: 24
-                            visible: !playback.playing
-
-                            onPaint: {
-                                const ctx = getContext("2d")
-                                ctx.reset()
-                                ctx.fillStyle = playButton.enabled ? theme.panelMuted : theme.textMuted
-                                ctx.beginPath()
-                                ctx.moveTo(6, 3)
-                                ctx.lineTo(20, 12)
-                                ctx.lineTo(6, 21)
-                                ctx.closePath()
-                                ctx.fill()
-                            }
-
-                            Component.onCompleted: requestPaint()
-                            onVisibleChanged: requestPaint()
-                            Connections {
-                                target: playButton
-                                function onEnabledChanged() { playGlyph.requestPaint() }
-                            }
+                            width: 18
+                            height: 18
+                            sourceSize.width: 18
+                            sourceSize.height: 18
+                            source: "qrc:/qt/qml/MyFin/src/ui/qml/assets/icons/repeat-one.svg"
+                            opacity: repeatButton.enabled ? 1.0 : 0.38
                         }
 
-                        Row {
-                            anchors.centerIn: parent
-                            spacing: 5
-                            visible: playback.playing
-
-                            Rectangle {
-                                width: 5
-                                height: 18
-                                radius: 1
-                                color: playButton.enabled ? theme.panelMuted : theme.textMuted
-                            }
-
-                            Rectangle {
-                                width: 5
-                                height: 18
-                                radius: 1
-                                color: playButton.enabled ? theme.panelMuted : theme.textMuted
-                            }
+                        Text {
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
+                            anchors.rightMargin: -1
+                            anchors.bottomMargin: -1
+                            text: "1"
+                            color: root.controlFgColor(repeatButton.enabled, playback.repeatCurrent)
+                            font.pixelSize: 8
+                            font.weight: Font.Black
+                            visible: playback.repeatCurrent
                         }
-                    }
-                }
-
-                ToolButton {
-                    id: nextButton
-                    enabled: playback.canGoNext
-                    hoverEnabled: enabled
-                    onClicked: playback.next()
-                    leftPadding: 0
-                    rightPadding: 0
-                    topPadding: 0
-                    bottomPadding: 0
-
-                    background: Rectangle {
-                        implicitWidth: 40
-                        implicitHeight: 40
-                        radius: 20
-                        color: root.controlBgColor(nextButton.enabled, false, nextButton.hovered)
-                        border.width: 1
-                        border.color: theme.stroke
-                    }
-
-                    contentItem: Text {
-                        text: "\u23ED"
-                        color: root.controlFgColor(nextButton.enabled, false)
-                        font.pixelSize: 16
-                        font.weight: Font.Black
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
                     }
                 }
             }
@@ -324,17 +307,21 @@ Rectangle {
             RowLayout {
                 spacing: 8
                 Layout.leftMargin: 8
+                Layout.preferredWidth: root.volumeClusterWidth
+                Layout.alignment: Qt.AlignRight
 
                 Text {
                     text: root.volumeIcon(playback.outputVolume)
                     color: theme.textMuted
                     font.pixelSize: 15
                     Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: 20
+                    horizontalAlignment: Text.AlignHCenter
                 }
 
                 Slider {
                     id: volumeSlider
-                    Layout.preferredWidth: 110
+                    Layout.fillWidth: true
                     from: 0
                     to: 1
                     value: playback.outputVolume

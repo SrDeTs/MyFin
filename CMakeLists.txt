@@ -110,6 +110,12 @@ qt_add_qml_module(myfin
         src/ui/qml/screens/HomeScreen.qml
         src/ui/qml/screens/LoginScreen.qml
         src/ui/qml/screens/ConfigScreen.qml
+    RESOURCES
+        src/ui/qml/assets/icons/previous.svg
+        src/ui/qml/assets/icons/play.svg
+        src/ui/qml/assets/icons/pause.svg
+        src/ui/qml/assets/icons/next.svg
+        src/ui/qml/assets/icons/repeat-one.svg
 )
 
 set_target_properties(myfin PROPERTIES
