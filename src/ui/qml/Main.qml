@@ -38,7 +38,7 @@ ApplicationWindow {
                 spacing: 18
 
                 ColumnLayout {
-                    spacing: 6
+                    spacing: 0
 
                     Text {
                         text: "MYFIN"
@@ -46,12 +46,6 @@ ApplicationWindow {
                         font.pixelSize: 29
                         font.letterSpacing: 2
                         font.weight: Font.Black
-                    }
-
-                    Text {
-                        text: "Jellyfin music for Linux"
-                        color: theme.textMuted
-                        font.pixelSize: 13
                     }
                 }
 
@@ -80,40 +74,6 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
             spacing: 18
-
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 74
-                radius: theme.radiusLarge
-                color: theme.panel
-                border.width: 1
-                border.color: theme.stroke
-
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.margins: 18
-                    spacing: 16
-
-                    Text {
-                        text: window.currentSection === "musicas" ? "Musicas" : "Configuracoes"
-                        color: theme.text
-                        font.pixelSize: 24
-                        font.weight: Font.Black
-                    }
-
-                    Text {
-                        text: window.currentSection === "musicas"
-                              ? AppVm.library.statusMessage
-                              : AppVm.session.authenticated
-                                ? AppVm.session.summary
-                                : "Gerencie sua conexao com o Jellyfin"
-                        color: theme.textMuted
-                        font.pixelSize: 12
-                        elide: Text.ElideRight
-                        Layout.fillWidth: true
-                    }
-                }
-            }
 
             HomeScreen {
                 visible: window.currentSection === "musicas"

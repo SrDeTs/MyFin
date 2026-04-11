@@ -35,15 +35,9 @@ Item {
                         font.weight: Font.DemiBold
                     }
 
-                    Text {
-                        text: appVm.session.authenticated
-                              ? appVm.library.trackCount + " faixas prontas para tocar de " + appVm.library.serverLabel
-                              : appVm.library.trackCount > 0
-                                ? "Navegando pelo ultimo snapshot local enquanto offline"
-                                : "Conecte no Jellyfin em Configuracoes para carregar a biblioteca"
-                        color: theme.textMuted
-                        font.pixelSize: 13
+                    Item {
                         Layout.fillWidth: true
+                        implicitHeight: 0
                     }
                 }
 

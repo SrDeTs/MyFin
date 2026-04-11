@@ -28,26 +28,6 @@ Item {
                 x: Math.max(0, (parent.width - width) / 2)
                 spacing: 18
 
-                Column {
-                    width: parent.width
-                    spacing: 4
-
-                    Text {
-                        text: "Configuracoes"
-                        color: theme.text
-                        font.pixelSize: 26
-                        font.weight: Font.DemiBold
-                    }
-
-                    Text {
-                        width: parent.width
-                        text: "Tudo relacionado a conta Jellyfin, sessao atual e sincronizacao fica aqui."
-                        color: theme.textMuted
-                        font.pixelSize: 13
-                        wrapMode: Text.WordWrap
-                    }
-                }
-
                 Rectangle {
                     width: parent.width
                     implicitHeight: accountCardContent.implicitHeight + 36
@@ -183,42 +163,7 @@ Item {
                     }
                 }
 
-                Rectangle {
-                    width: parent.width
-                    implicitHeight: stateCardContent.implicitHeight + 36
-                    radius: theme.radiusMedium
-                    color: theme.panelRaised
-                    border.width: 1
-                    border.color: theme.stroke
 
-                    Column {
-                        id: stateCardContent
-                        width: parent.width - 36
-                        anchors.left: parent.left
-                        anchors.top: parent.top
-                        anchors.margins: 18
-                        spacing: 8
-
-                        Text {
-                            text: "Estado"
-                            color: theme.text
-                            font.pixelSize: 18
-                            font.weight: Font.DemiBold
-                        }
-
-                        Text {
-                            text: "Conexao: " + appVm.session.stateLabel
-                            color: theme.textMuted
-                            font.pixelSize: 13
-                        }
-
-                        Text {
-                            text: "Biblioteca em cache: " + appVm.library.trackCount + " faixas"
-                            color: theme.textMuted
-                            font.pixelSize: 13
-                        }
-                    }
-                }
             }
 
             ScrollBar.vertical: ScrollBar {

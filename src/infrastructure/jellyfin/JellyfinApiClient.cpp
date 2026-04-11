@@ -358,8 +358,8 @@ void JellyfinApiClient::fetchHomeFeed(int limit)
         query.addQueryItem(QStringLiteral("recursive"), QStringLiteral("true"));
         query.addQueryItem(QStringLiteral("includeItemTypes"), QStringLiteral("Audio"));
         query.addQueryItem(QStringLiteral("enableUserData"), QStringLiteral("true"));
-        query.addQueryItem(QStringLiteral("sortBy"), QStringLiteral("DateCreated"));
-        query.addQueryItem(QStringLiteral("sortOrder"), QStringLiteral("Descending"));
+        query.addQueryItem(QStringLiteral("sortBy"), QStringLiteral("SortName"));
+        query.addQueryItem(QStringLiteral("sortOrder"), QStringLiteral("Ascending"));
         query.addQueryItem(QStringLiteral("startIndex"), QString::number(startIndex));
         query.addQueryItem(QStringLiteral("limit"), QString::number(pageSize));
 

@@ -93,23 +93,8 @@ Rectangle {
                     elide: Text.ElideRight
                 }
 
-                Text {
-                    text: playback.hasTrack
-                          ? playback.artist + " • " + playback.album
-                          : "Selecione uma faixa para iniciar a reprodução"
-                    color: theme.textMuted
-                    font.pixelSize: 13
-                    elide: Text.ElideRight
-                }
-
-                Text {
-                    visible: playback.hasTrack
-                    text: playback.queueLength > 0
-                          ? playback.queueLength + " na fila"
-                          : "Ultima faixa da fila"
-                    color: theme.accentStrong
-                    font.pixelSize: 11
-                    font.weight: Font.DemiBold
+                Item {
+                    implicitHeight: 0
                 }
             }
 
