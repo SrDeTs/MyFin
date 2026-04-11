@@ -24,6 +24,7 @@ class PlaybackViewModel final : public QObject {
     Q_PROPERTY(qint64 durationMs READ durationMs NOTIFY stateChanged)
     Q_PROPERTY(QString positionLabel READ positionLabel NOTIFY stateChanged)
     Q_PROPERTY(QString durationLabel READ durationLabel NOTIFY stateChanged)
+    Q_PROPERTY(float outputVolume READ outputVolume NOTIFY stateChanged)
 
 public:
     explicit PlaybackViewModel(Infrastructure::Playback::PlaybackController& playback,

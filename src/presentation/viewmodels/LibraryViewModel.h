@@ -25,6 +25,7 @@ class LibraryViewModel final : public QObject {
     Q_PROPERTY(bool connected READ connected NOTIFY connectedChanged)
     Q_PROPERTY(bool hasTracks READ hasTracks NOTIFY contentChanged)
     Q_PROPERTY(int trackCount READ trackCount NOTIFY contentChanged)
+    Q_PROPERTY(int cachedTrackCount READ cachedTrackCount NOTIFY contentChanged)
     Q_PROPERTY(QString searchQuery READ searchQuery WRITE setSearchQuery NOTIFY contentChanged)
     Q_PROPERTY(QString headlineTitle READ headlineTitle NOTIFY contentChanged)
     Q_PROPERTY(QString headlineSubtitle READ headlineSubtitle NOTIFY contentChanged)
@@ -41,6 +42,7 @@ public:
     bool connected() const;
     bool hasTracks() const;
     int trackCount() const;
+    int cachedTrackCount() const;
     QString searchQuery() const;
     void setSearchQuery(const QString& value);
     QString headlineTitle() const;

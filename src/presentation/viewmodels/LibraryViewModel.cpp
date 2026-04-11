@@ -112,6 +112,11 @@ int LibraryViewModel::trackCount() const
     return m_filteredTracks.size();
 }
 
+int LibraryViewModel::cachedTrackCount() const
+{
+    return m_cachedTracks.size();
+}
+
 QString LibraryViewModel::searchQuery() const
 {
     return m_searchQuery;

@@ -105,7 +105,8 @@ qt_add_qml_module(myfin
         src/ui/qml/components/AppTextField.qml
         src/ui/qml/components/MiniPlayer.qml
         src/ui/qml/screens/HomeScreen.qml
-        src/ui/qml/screens/SettingsScreen.qml
+        src/ui/qml/screens/LoginScreen.qml
+        src/ui/qml/screens/ConfigScreen.qml
 )
 
 set_target_properties(myfin PROPERTIES

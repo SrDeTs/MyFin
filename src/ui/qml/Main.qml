@@ -72,9 +72,17 @@ ApplicationWindow {
                     SidebarButton {
                         Layout.fillWidth: true
                         theme: theme
+                        text: "Login Jellyfin"
+                        active: window.currentSection === "login"
+                        onClicked: window.currentSection = "login"
+                    }
+
+                    SidebarButton {
+                        Layout.fillWidth: true
+                        theme: theme
                         text: "Configuracoes"
-                        active: window.currentSection === "configuracoes"
-                        onClicked: window.currentSection = "configuracoes"
+                        active: window.currentSection === "config"
+                        onClicked: window.currentSection = "config"
                     }
                 }
 
@@ -95,8 +103,16 @@ ApplicationWindow {
                 theme: theme
             }
 
-            SettingsScreen {
-                visible: window.currentSection === "configuracoes"
+            LoginScreen {
+                visible: window.currentSection === "login"
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                appVm: AppVm
+                theme: theme
+            }
+
+            ConfigScreen {
+                visible: window.currentSection === "config"
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 appVm: AppVm
