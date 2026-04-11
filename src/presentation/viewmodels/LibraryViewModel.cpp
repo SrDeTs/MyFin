@@ -166,9 +166,9 @@ void LibraryViewModel::reload()
 
 void LibraryViewModel::playTrack(const QString& trackId)
 {
-    for (const Domain::Track& track : m_cachedTracks) {
-        if (track.id == trackId) {
-            m_playback.playNow(track);
+    for (qsizetype index = 0; index < m_cachedTracks.size(); ++index) {
+        if (m_cachedTracks.at(index).id == trackId) {
+            m_playback.playQueue(m_cachedTracks, static_cast<int>(index));
             return;
         }
     }

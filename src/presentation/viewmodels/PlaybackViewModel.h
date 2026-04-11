@@ -17,7 +17,12 @@ class PlaybackViewModel final : public QObject {
     Q_PROPERTY(QString signalPath READ signalPath NOTIFY stateChanged)
     Q_PROPERTY(bool playing READ playing NOTIFY stateChanged)
     Q_PROPERTY(bool hasTrack READ hasTrack NOTIFY stateChanged)
+    Q_PROPERTY(bool canGoNext READ canGoNext NOTIFY stateChanged)
     Q_PROPERTY(int queueLength READ queueLength NOTIFY stateChanged)
+    Q_PROPERTY(qint64 positionMs READ positionMs NOTIFY stateChanged)
+    Q_PROPERTY(qint64 durationMs READ durationMs NOTIFY stateChanged)
+    Q_PROPERTY(QString positionLabel READ positionLabel NOTIFY stateChanged)
+    Q_PROPERTY(QString durationLabel READ durationLabel NOTIFY stateChanged)
 
 public:
     explicit PlaybackViewModel(Infrastructure::Playback::PlaybackController& playback,
@@ -30,15 +35,23 @@ public:
     QString signalPath() const;
     bool playing() const;
     bool hasTrack() const;
+    bool canGoNext() const;
     int queueLength() const;
+    qint64 positionMs() const;
+    qint64 durationMs() const;
+    QString positionLabel() const;
+    QString durationLabel() const;
 
     Q_INVOKABLE void togglePlaying();
     Q_INVOKABLE void next();
+    Q_INVOKABLE void seek(qint64 positionMs);
 
 signals:
     void stateChanged();
 
 private:
+    static QString formatTime(qint64 positionMs);
+
     Infrastructure::Playback::PlaybackController& m_playback;
 };
 

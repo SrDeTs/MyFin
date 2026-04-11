@@ -39,11 +39,13 @@ PlaybackController::PlaybackController(Infrastructure::Jellyfin::JellyfinApiClie
 
     connect(m_backend, &QtMediaPlaybackBackend::positionChanged, this, [this](qint64 positionMs) {
         m_state.positionMs = positionMs;
+        emit stateChanged();
     });
 
     connect(m_backend, &QtMediaPlaybackBackend::durationChanged, this, [this](qint64 durationMs) {
         if (durationMs > 0) {
             m_state.durationMs = durationMs;
+            emit stateChanged();
         }
     });
 
@@ -60,6 +62,7 @@ PlaybackController::PlaybackController(Infrastructure::Jellyfin::JellyfinApiClie
         m_progressTimer->stop();
         m_state.playing = false;
         m_state.positionMs = m_state.durationMs;
+        m_state.queueLength = qMax(0, m_queue.size() - m_currentIndex - 1);
         emit stateChanged();
     });
 
@@ -84,13 +87,27 @@ const QVector<Domain::Track>& PlaybackController::queue() const
 
 void PlaybackController::playNow(const Domain::Track& track)
 {
+    playQueue(QVector<Domain::Track>{track}, 0);
+}
+
+void PlaybackController::playQueue(const QVector<Domain::Track>& tracks, int startIndex)
+{
+    if (tracks.isEmpty() || startIndex < 0 || startIndex >= tracks.size()) {
+        return;
+    }
+
     if (m_currentIndex >= 0 && m_currentIndex < m_queue.size()) {
         stopCurrentTrack(false);
     }
 
-    m_queue.append(track);
-    m_currentIndex = m_queue.size() - 1;
+    m_queue = tracks;
+    m_currentIndex = startIndex;
     playCurrent();
+}
+
+bool PlaybackController::hasNext() const
+{
+    return m_currentIndex >= 0 && m_currentIndex + 1 < m_queue.size();
 }
 
 void PlaybackController::togglePlaying()
@@ -120,13 +137,26 @@ void PlaybackController::togglePlaying()
 
 void PlaybackController::next()
 {
-    if (m_currentIndex < 0 || m_currentIndex + 1 >= m_queue.size()) {
+    if (!hasNext()) {
         return;
     }
 
     stopCurrentTrack(completionReached());
     ++m_currentIndex;
     playCurrent();
+}
+
+void PlaybackController::seek(qint64 positionMs)
+{
+    if (m_currentIndex < 0 || m_currentIndex >= m_queue.size()) {
+        return;
+    }
+
+    const qint64 clampedPosition = qBound<qint64>(0, positionMs, m_state.durationMs > 0 ? m_state.durationMs : positionMs);
+    m_backend->setPosition(clampedPosition);
+    m_state.positionMs = clampedPosition;
+    emit stateChanged();
+    flushPlaybackProgress(!m_backend->isPlaying());
 }
 
 void PlaybackController::playCurrent()
@@ -180,7 +210,7 @@ void PlaybackController::syncStateFromCurrent()
     m_state.album = track.album;
     m_state.coverSource = m_jellyfin.coverSourceForArtworkKey(track.artworkKey);
     m_state.signalPath = track.streamProfile;
-    m_state.queueLength = m_queue.size();
+    m_state.queueLength = qMax(0, m_queue.size() - m_currentIndex - 1);
     m_state.positionMs = positionMs;
     m_state.durationMs = durationMs;
     m_state.playing = playing;

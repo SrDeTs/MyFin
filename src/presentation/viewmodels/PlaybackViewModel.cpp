@@ -47,9 +47,34 @@ bool PlaybackViewModel::hasTrack() const
     return !m_playback.state().trackId.isEmpty();
 }
 
+bool PlaybackViewModel::canGoNext() const
+{
+    return m_playback.hasNext();
+}
+
 int PlaybackViewModel::queueLength() const
 {
     return m_playback.state().queueLength;
+}
+
+qint64 PlaybackViewModel::positionMs() const
+{
+    return m_playback.state().positionMs;
+}
+
+qint64 PlaybackViewModel::durationMs() const
+{
+    return m_playback.state().durationMs;
+}
+
+QString PlaybackViewModel::positionLabel() const
+{
+    return formatTime(positionMs());
+}
+
+QString PlaybackViewModel::durationLabel() const
+{
+    return formatTime(durationMs());
 }
 
 void PlaybackViewModel::togglePlaying()
@@ -60,6 +85,23 @@ void PlaybackViewModel::togglePlaying()
 void PlaybackViewModel::next()
 {
     m_playback.next();
+}
+
+void PlaybackViewModel::seek(qint64 positionMs)
+{
+    m_playback.seek(positionMs);
+}
+
+QString PlaybackViewModel::formatTime(qint64 positionMs)
+{
+    if (positionMs <= 0) {
+        return QStringLiteral("0:00");
+    }
+
+    const qint64 totalSeconds = positionMs / 1000;
+    const qint64 minutes = totalSeconds / 60;
+    const qint64 seconds = totalSeconds % 60;
+    return QStringLiteral("%1:%2").arg(minutes).arg(seconds, 2, 10, QLatin1Char('0'));
 }
 
 }  // namespace MyFin::Presentation

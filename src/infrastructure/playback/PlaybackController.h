@@ -45,9 +45,13 @@ public:
     const QVector<Domain::Track>& queue() const;
 
     void playNow(const Domain::Track& track);
+    void playQueue(const QVector<Domain::Track>& tracks, int startIndex);
+
+    bool hasNext() const;
 
     Q_INVOKABLE void togglePlaying();
     Q_INVOKABLE void next();
+    Q_INVOKABLE void seek(qint64 positionMs);
 
 signals:
     void stateChanged();

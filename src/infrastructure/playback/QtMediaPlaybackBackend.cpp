@@ -64,6 +64,11 @@ void QtMediaPlaybackBackend::setVolume(float value)
     m_audioOutput->setVolume(value);
 }
 
+void QtMediaPlaybackBackend::setPosition(qint64 positionMs)
+{
+    m_player->setPosition(positionMs);
+}
+
 bool QtMediaPlaybackBackend::isPlaying() const
 {
     return m_player->playbackState() == QMediaPlayer::PlayingState;

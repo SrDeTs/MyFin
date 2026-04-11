@@ -22,6 +22,7 @@ public:
     void stop() override;
 
     void setVolume(float value);
+    void setPosition(qint64 positionMs);
     bool isPlaying() const;
     qint64 position() const;
     qint64 duration() const;
