@@ -105,9 +105,19 @@ void PlaybackController::playQueue(const QVector<Domain::Track>& tracks, int sta
     playCurrent();
 }
 
+bool PlaybackController::hasPrevious() const
+{
+    return m_currentIndex > 0 && m_currentIndex < m_queue.size();
+}
+
 bool PlaybackController::hasNext() const
 {
     return m_currentIndex >= 0 && m_currentIndex + 1 < m_queue.size();
+}
+
+float PlaybackController::outputVolume() const
+{
+    return m_settings.outputVolume();
 }
 
 void PlaybackController::togglePlaying()
@@ -135,6 +145,17 @@ void PlaybackController::togglePlaying()
     emit stateChanged();
 }
 
+void PlaybackController::previous()
+{
+    if (!hasPrevious()) {
+        return;
+    }
+
+    stopCurrentTrack(false);
+    --m_currentIndex;
+    playCurrent();
+}
+
 void PlaybackController::next()
 {
     if (!hasNext()) {
@@ -157,6 +178,14 @@ void PlaybackController::seek(qint64 positionMs)
     m_state.positionMs = clampedPosition;
     emit stateChanged();
     flushPlaybackProgress(!m_backend->isPlaying());
+}
+
+void PlaybackController::setOutputVolume(float value)
+{
+    const float clampedVolume = qBound(0.0F, value, 1.0F);
+    m_settings.setOutputVolume(clampedVolume);
+    m_backend->setVolume(clampedVolume);
+    emit stateChanged();
 }
 
 void PlaybackController::playCurrent()

@@ -47,6 +47,11 @@ bool PlaybackViewModel::hasTrack() const
     return !m_playback.state().trackId.isEmpty();
 }
 
+bool PlaybackViewModel::canGoPrevious() const
+{
+    return m_playback.hasPrevious();
+}
+
 bool PlaybackViewModel::canGoNext() const
 {
     return m_playback.hasNext();
@@ -77,9 +82,19 @@ QString PlaybackViewModel::durationLabel() const
     return formatTime(durationMs());
 }
 
+float PlaybackViewModel::outputVolume() const
+{
+    return m_playback.outputVolume();
+}
+
 void PlaybackViewModel::togglePlaying()
 {
     m_playback.togglePlaying();
+}
+
+void PlaybackViewModel::previous()
+{
+    m_playback.previous();
 }
 
 void PlaybackViewModel::next()
@@ -90,6 +105,11 @@ void PlaybackViewModel::next()
 void PlaybackViewModel::seek(qint64 positionMs)
 {
     m_playback.seek(positionMs);
+}
+
+void PlaybackViewModel::setOutputVolume(float value)
+{
+    m_playback.setOutputVolume(value);
 }
 
 QString PlaybackViewModel::formatTime(qint64 positionMs)

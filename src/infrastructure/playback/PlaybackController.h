@@ -47,11 +47,15 @@ public:
     void playNow(const Domain::Track& track);
     void playQueue(const QVector<Domain::Track>& tracks, int startIndex);
 
+    bool hasPrevious() const;
     bool hasNext() const;
+    float outputVolume() const;
 
     Q_INVOKABLE void togglePlaying();
+    Q_INVOKABLE void previous();
     Q_INVOKABLE void next();
     Q_INVOKABLE void seek(qint64 positionMs);
+    Q_INVOKABLE void setOutputVolume(float value);
 
 signals:
     void stateChanged();

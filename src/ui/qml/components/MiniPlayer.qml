@@ -13,7 +13,34 @@ Rectangle {
     border.width: 1
     border.color: theme.stroke
 
-    implicitHeight: 112
+    implicitHeight: 128
+
+    function controlBgColor(enabled, highlighted, hovered) {
+        if (!enabled) {
+            return theme.panelMuted
+        }
+        if (highlighted) {
+            return hovered ? theme.warm : theme.accentStrong
+        }
+        return hovered ? theme.panel : theme.panelRaised
+    }
+
+    function controlFgColor(enabled, highlighted) {
+        if (!enabled) {
+            return theme.textMuted
+        }
+        return highlighted ? theme.window : theme.text
+    }
+
+    function volumeIcon(volume) {
+        if (volume <= 0.001) {
+            return "\uD83D\uDD07"
+        }
+        if (volume < 0.45) {
+            return "\uD83D\uDD08"
+        }
+        return "\uD83D\uDD0A"
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -25,9 +52,9 @@ Rectangle {
             spacing: 14
 
             Rectangle {
-                Layout.preferredWidth: 60
-                Layout.preferredHeight: 60
-                radius: 14
+                Layout.preferredWidth: 64
+                Layout.preferredHeight: 64
+                radius: 16
                 color: theme.panelRaised
                 border.width: 1
                 border.color: theme.stroke
@@ -38,8 +65,8 @@ Rectangle {
                     asynchronous: true
                     cache: false
                     fillMode: Image.PreserveAspectCrop
-                    sourceSize.width: 60
-                    sourceSize.height: 60
+                    sourceSize.width: 64
+                    sourceSize.height: 64
                     source: playback.hasTrack ? playback.coverSource : ""
                     visible: playback.hasTrack && playback.coverSource.length > 0
                 }
@@ -56,13 +83,13 @@ Rectangle {
 
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: 2
+                spacing: 3
 
                 Text {
                     text: playback.hasTrack ? playback.title : "Nada tocando"
                     color: theme.text
-                    font.pixelSize: 17
-                    font.weight: Font.DemiBold
+                    font.pixelSize: 18
+                    font.weight: Font.Black
                     elide: Text.ElideRight
                 }
 
@@ -74,68 +101,103 @@ Rectangle {
                     font.pixelSize: 13
                     elide: Text.ElideRight
                 }
+
+                Text {
+                    visible: playback.hasTrack
+                    text: playback.queueLength > 0
+                          ? playback.queueLength + " na fila"
+                          : "Ultima faixa da fila"
+                    color: theme.accentStrong
+                    font.pixelSize: 11
+                    font.weight: Font.DemiBold
+                }
             }
 
             RowLayout {
-                spacing: 10
+                spacing: 8
 
                 ToolButton {
-                    text: playback.playing ? "||" : ">"
-                    enabled: playback.hasTrack
-                    onClicked: playback.togglePlaying()
-
-                    font.pixelSize: 18
-                    font.weight: Font.Black
+                    id: previousButton
+                    enabled: playback.canGoPrevious
+                    hoverEnabled: enabled
+                    onClicked: playback.previous()
                     leftPadding: 0
                     rightPadding: 0
                     topPadding: 0
                     bottomPadding: 0
 
                     background: Rectangle {
-                        implicitWidth: 48
-                        implicitHeight: 48
-                        radius: 24
-                        color: parent.enabled ? theme.accentStrong : theme.panelRaised
+                        implicitWidth: 40
+                        implicitHeight: 40
+                        radius: 20
+                        color: root.controlBgColor(previousButton.enabled, false, previousButton.hovered)
                         border.width: 1
                         border.color: theme.stroke
                     }
 
                     contentItem: Text {
-                        text: parent.text
-                        color: parent.enabled ? theme.window : theme.textMuted
-                        font.pixelSize: parent.font.pixelSize
-                        font.weight: parent.font.weight
+                        text: "\u23EE"
+                        color: root.controlFgColor(previousButton.enabled, false)
+                        font.pixelSize: 16
+                        font.weight: Font.Black
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
                 }
 
                 ToolButton {
-                    text: ">>"
-                    enabled: playback.canGoNext
-                    onClicked: playback.next()
-
-                    font.pixelSize: 15
-                    font.weight: Font.Black
+                    id: playButton
+                    enabled: playback.hasTrack
+                    hoverEnabled: enabled
+                    onClicked: playback.togglePlaying()
                     leftPadding: 0
                     rightPadding: 0
                     topPadding: 0
                     bottomPadding: 0
 
                     background: Rectangle {
-                        implicitWidth: 42
-                        implicitHeight: 42
-                        radius: 21
-                        color: parent.enabled ? theme.panelRaised : theme.panel
+                        implicitWidth: 50
+                        implicitHeight: 50
+                        radius: 25
+                        color: root.controlBgColor(playButton.enabled, true, playButton.hovered)
                         border.width: 1
                         border.color: theme.stroke
                     }
 
                     contentItem: Text {
-                        text: parent.text
-                        color: parent.enabled ? theme.text : theme.textMuted
-                        font.pixelSize: parent.font.pixelSize
-                        font.weight: parent.font.weight
+                        text: playback.playing ? "\u23F8" : "\u25B6"
+                        color: root.controlFgColor(playButton.enabled, true)
+                        font.pixelSize: playback.playing ? 17 : 19
+                        font.weight: Font.Black
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+
+                ToolButton {
+                    id: nextButton
+                    enabled: playback.canGoNext
+                    hoverEnabled: enabled
+                    onClicked: playback.next()
+                    leftPadding: 0
+                    rightPadding: 0
+                    topPadding: 0
+                    bottomPadding: 0
+
+                    background: Rectangle {
+                        implicitWidth: 40
+                        implicitHeight: 40
+                        radius: 20
+                        color: root.controlBgColor(nextButton.enabled, false, nextButton.hovered)
+                        border.width: 1
+                        border.color: theme.stroke
+                    }
+
+                    contentItem: Text {
+                        text: "\u23ED"
+                        color: root.controlFgColor(nextButton.enabled, false)
+                        font.pixelSize: 16
+                        font.weight: Font.Black
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
@@ -163,13 +225,14 @@ Rectangle {
                 to: Math.max(playback.durationMs, 1)
                 value: pressed ? value : playback.positionMs
                 onMoved: playback.seek(Math.round(value))
+                onPressedChanged: if (!pressed) playback.seek(Math.round(value))
 
                 background: Rectangle {
                     x: progressSlider.leftPadding
                     y: progressSlider.topPadding + progressSlider.availableHeight / 2 - height / 2
                     width: progressSlider.availableWidth
-                    height: 4
-                    radius: 2
+                    height: 5
+                    radius: 3
                     color: theme.panelRaised
 
                     Rectangle {
@@ -197,6 +260,54 @@ Rectangle {
                 color: theme.textMuted
                 font.pixelSize: 12
                 Layout.preferredWidth: 42
+            }
+
+            RowLayout {
+                spacing: 8
+                Layout.leftMargin: 8
+
+                Text {
+                    text: root.volumeIcon(playback.outputVolume)
+                    color: theme.textMuted
+                    font.pixelSize: 15
+                    Layout.alignment: Qt.AlignVCenter
+                }
+
+                Slider {
+                    id: volumeSlider
+                    Layout.preferredWidth: 110
+                    from: 0
+                    to: 1
+                    value: playback.outputVolume
+                    onMoved: playback.setOutputVolume(value)
+
+                    background: Rectangle {
+                        x: volumeSlider.leftPadding
+                        y: volumeSlider.topPadding + volumeSlider.availableHeight / 2 - height / 2
+                        width: volumeSlider.availableWidth
+                        height: 4
+                        radius: 2
+                        color: theme.panelRaised
+
+                        Rectangle {
+                            width: volumeSlider.visualPosition * parent.width
+                            height: parent.height
+                            radius: parent.radius
+                            color: theme.warm
+                        }
+                    }
+
+                    handle: Rectangle {
+                        x: volumeSlider.leftPadding + volumeSlider.visualPosition * (volumeSlider.availableWidth - width)
+                        y: volumeSlider.topPadding + volumeSlider.availableHeight / 2 - height / 2
+                        width: 12
+                        height: 12
+                        radius: 6
+                        color: theme.text
+                        border.width: 1
+                        border.color: theme.stroke
+                    }
+                }
             }
         }
     }
