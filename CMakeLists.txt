@@ -10,8 +10,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(PkgConfig REQUIRED)
-
 find_package(Qt6 6.8 REQUIRED COMPONENTS
     Core
     Gui
@@ -23,11 +21,6 @@ find_package(Qt6 6.8 REQUIRED COMPONENTS
     Concurrent
     Multimedia
     Sql
-)
-
-pkg_check_modules(GSTREAMER REQUIRED IMPORTED_TARGET
-    gstreamer-1.0
-    gstreamer-audio-1.0
 )
 
 qt_standard_project_setup(REQUIRES 6.8)
@@ -60,8 +53,6 @@ set(MYFIN_SOURCES
     src/infrastructure/playback/IPlaybackBackend.h
     src/infrastructure/playback/QtMediaPlaybackBackend.h
     src/infrastructure/playback/QtMediaPlaybackBackend.cpp
-    src/infrastructure/playback/GStreamerPlaybackBackend.h
-    src/infrastructure/playback/GStreamerPlaybackBackend.cpp
     src/infrastructure/playback/PlaybackController.h
     src/infrastructure/playback/PlaybackController.cpp
     src/linux/MprisService.h
@@ -103,7 +94,6 @@ target_link_libraries(myfin PRIVATE
     Qt6::Concurrent
     Qt6::Multimedia
     Qt6::Sql
-    PkgConfig::GSTREAMER
 )
 
 qt_add_qml_module(myfin

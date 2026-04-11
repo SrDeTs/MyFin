@@ -1,7 +1,7 @@
 #pragma once
 
 #include "domain/entities/Track.h"
-#include "infrastructure/playback/GStreamerPlaybackBackend.h"
+#include "infrastructure/playback/QtMediaPlaybackBackend.h"
 
 #include <QObject>
 #include <QVector>
@@ -64,6 +64,9 @@ public:
     Q_INVOKABLE void setOutputVolume(float value);
     Q_INVOKABLE void setOutputDevice(const QString& deviceId);
 
+    void setGaplessEnabled(bool value);
+    void setCrossfadeSeconds(int value);
+
 signals:
     void stateChanged();
     void audioDevicesChanged();
@@ -79,7 +82,7 @@ private:
 
     Infrastructure::Jellyfin::JellyfinApiClient& m_jellyfin;
     Infrastructure::Settings::SettingsService& m_settings;
-    GStreamerPlaybackBackend* m_backend = nullptr;
+    QtMediaPlaybackBackend* m_backend = nullptr;
     QTimer* m_progressTimer = nullptr;
     QVector<Domain::Track> m_queue;
     int m_currentIndex = -1;
