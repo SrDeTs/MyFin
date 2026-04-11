@@ -74,10 +74,26 @@ Item {
 
                             TextField {
                                 width: parent.width
+                                implicitHeight: 42
                                 text: appVm.session.serverUrl
                                 placeholderText: "http://192.168.1.71:8096"
                                 enabled: !appVm.session.busy
+                                color: theme.text
+                                placeholderTextColor: theme.textMuted
+                                leftPadding: 14
+                                rightPadding: 14
+                                topPadding: 0
+                                bottomPadding: 0
+                                verticalAlignment: TextInput.AlignVCenter
+                                selectByMouse: true
                                 onTextEdited: appVm.session.serverUrl = text
+
+                                background: Rectangle {
+                                    radius: 14
+                                    color: theme.panelRaised
+                                    border.width: 1
+                                    border.color: parent.activeFocus ? theme.accentStrong : theme.stroke
+                                }
                             }
                         }
 
@@ -94,10 +110,26 @@ Item {
 
                             TextField {
                                 width: parent.width
+                                implicitHeight: 42
                                 text: appVm.session.username
                                 placeholderText: "Michael"
                                 enabled: !appVm.session.busy
+                                color: theme.text
+                                placeholderTextColor: theme.textMuted
+                                leftPadding: 14
+                                rightPadding: 14
+                                topPadding: 0
+                                bottomPadding: 0
+                                verticalAlignment: TextInput.AlignVCenter
+                                selectByMouse: true
                                 onTextEdited: appVm.session.username = text
+
+                                background: Rectangle {
+                                    radius: 14
+                                    color: theme.panelRaised
+                                    border.width: 1
+                                    border.color: parent.activeFocus ? theme.accentStrong : theme.stroke
+                                }
                             }
                         }
 
@@ -114,14 +146,30 @@ Item {
 
                             TextField {
                                 width: parent.width
+                                implicitHeight: 42
                                 text: appVm.session.password
                                 placeholderText: appVm.session.authenticated
                                                  ? "Digite uma nova senha para reconectar"
                                                  : "Senha"
                                 echoMode: TextInput.Password
                                 enabled: !appVm.session.busy
+                                color: theme.text
+                                placeholderTextColor: theme.textMuted
+                                leftPadding: 14
+                                rightPadding: 14
+                                topPadding: 0
+                                bottomPadding: 0
+                                verticalAlignment: TextInput.AlignVCenter
+                                selectByMouse: true
                                 onTextEdited: appVm.session.password = text
                                 onAccepted: appVm.session.login()
+
+                                background: Rectangle {
+                                    radius: 14
+                                    color: theme.panelRaised
+                                    border.width: 1
+                                    border.color: parent.activeFocus ? theme.accentStrong : theme.stroke
+                                }
                             }
                         }
 
@@ -138,26 +186,77 @@ Item {
                             spacing: 10
 
                             Button {
+                                id: connectButton
                                 width: 140
                                 text: appVm.session.authenticated ? "Reconectar" : "Conectar"
                                 enabled: !appVm.session.busy
                                 onClicked: appVm.session.login()
+
+                                background: Rectangle {
+                                    radius: 14
+                                    color: connectButton.down ? theme.warm : theme.accentStrong
+                                    border.width: 1
+                                    border.color: theme.stroke
+                                }
+
+                                contentItem: Text {
+                                    text: connectButton.text
+                                    color: theme.window
+                                    font.pixelSize: 13
+                                    font.weight: Font.DemiBold
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
                             }
 
                             Button {
+                                id: refreshButton
                                 visible: appVm.session.authenticated
                                 width: 180
                                 text: "Atualizar biblioteca"
                                 enabled: !appVm.session.busy
                                 onClicked: appVm.reloadLibrary()
+
+                                background: Rectangle {
+                                    radius: 14
+                                    color: refreshButton.down ? theme.panel : theme.panelRaised
+                                    border.width: 1
+                                    border.color: theme.stroke
+                                }
+
+                                contentItem: Text {
+                                    text: refreshButton.text
+                                    color: theme.text
+                                    font.pixelSize: 13
+                                    font.weight: Font.DemiBold
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
                             }
 
                             Button {
+                                id: disconnectButton
                                 visible: appVm.session.authenticated
                                 width: 130
                                 text: "Desconectar"
                                 enabled: !appVm.session.busy
                                 onClicked: appVm.session.logout()
+
+                                background: Rectangle {
+                                    radius: 14
+                                    color: disconnectButton.down ? theme.panel : theme.panelRaised
+                                    border.width: 1
+                                    border.color: theme.stroke
+                                }
+
+                                contentItem: Text {
+                                    text: disconnectButton.text
+                                    color: theme.text
+                                    font.pixelSize: 13
+                                    font.weight: Font.DemiBold
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
                             }
                         }
                     }
