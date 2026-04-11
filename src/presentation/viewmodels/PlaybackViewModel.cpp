@@ -57,6 +57,11 @@ bool PlaybackViewModel::canGoNext() const
     return m_playback.hasNext();
 }
 
+bool PlaybackViewModel::repeatCurrent() const
+{
+    return m_playback.state().repeatCurrent;
+}
+
 int PlaybackViewModel::queueLength() const
 {
     return m_playback.state().queueLength;
@@ -110,6 +115,11 @@ void PlaybackViewModel::seek(qint64 positionMs)
 void PlaybackViewModel::setOutputVolume(float value)
 {
     m_playback.setOutputVolume(value);
+}
+
+void PlaybackViewModel::toggleRepeatCurrent()
+{
+    m_playback.toggleRepeatCurrent();
 }
 
 QString PlaybackViewModel::formatTime(qint64 positionMs)

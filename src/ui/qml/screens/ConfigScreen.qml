@@ -70,8 +70,9 @@ Item {
                                 font.weight: Font.DemiBold
                             }
 
-                            ComboBox {
+                            AppComboBox {
                                 width: parent.width
+                                theme: root.theme
                                 model: appVm.audio.outputDevices
                                 textRole: "name"
                                 currentIndex: appVm.audio.currentOutputDeviceIndex

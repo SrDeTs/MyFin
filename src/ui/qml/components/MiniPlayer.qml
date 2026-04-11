@@ -14,6 +14,7 @@ Rectangle {
     border.color: theme.stroke
 
     implicitHeight: 128
+    readonly property int controlClusterWidth: 210
 
     function controlBgColor(enabled, highlighted, hovered) {
         if (!enabled) {
@@ -81,25 +82,55 @@ Rectangle {
                 }
             }
 
-            ColumnLayout {
+            Item {
                 Layout.fillWidth: true
-                spacing: 3
+                Layout.preferredHeight: 64
 
                 Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.right: parent.right
                     text: playback.hasTrack ? playback.title : "Nada tocando"
                     color: theme.text
                     font.pixelSize: 18
                     font.weight: Font.Black
                     elide: Text.ElideRight
                 }
-
-                Item {
-                    implicitHeight: 0
-                }
             }
 
             RowLayout {
+                Layout.preferredWidth: root.controlClusterWidth
+                Layout.alignment: Qt.AlignRight
                 spacing: 8
+
+                ToolButton {
+                    id: repeatButton
+                    enabled: playback.hasTrack
+                    hoverEnabled: enabled
+                    onClicked: playback.toggleRepeatCurrent()
+                    leftPadding: 0
+                    rightPadding: 0
+                    topPadding: 0
+                    bottomPadding: 0
+
+                    background: Rectangle {
+                        implicitWidth: 40
+                        implicitHeight: 40
+                        radius: 20
+                        color: root.controlBgColor(repeatButton.enabled, playback.repeatCurrent, repeatButton.hovered)
+                        border.width: 1
+                        border.color: playback.repeatCurrent ? theme.accentStrong : theme.stroke
+                    }
+
+                    contentItem: Text {
+                        text: "1x"
+                        color: root.controlFgColor(repeatButton.enabled, playback.repeatCurrent)
+                        font.pixelSize: 12
+                        font.weight: Font.Black
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
 
                 ToolButton {
                     id: previousButton

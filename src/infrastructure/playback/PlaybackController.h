@@ -31,6 +31,7 @@ public:
         QString signalPath;
         QString errorText;
         bool playing = false;
+        bool repeatCurrent = false;
         int queueLength = 0;
         qint64 positionMs = 0;
         qint64 durationMs = 0;
@@ -63,6 +64,8 @@ public:
     Q_INVOKABLE void seek(qint64 positionMs);
     Q_INVOKABLE void setOutputVolume(float value);
     Q_INVOKABLE void setOutputDevice(const QString& deviceId);
+    Q_INVOKABLE void setRepeatCurrent(bool value);
+    Q_INVOKABLE void toggleRepeatCurrent();
 
     void setGaplessEnabled(bool value);
     void setCrossfadeSeconds(int value);

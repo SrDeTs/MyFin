@@ -60,6 +60,11 @@ PlaybackController::PlaybackController(Infrastructure::Jellyfin::JellyfinApiClie
         const bool markPlayed = completionReached();
         stopCurrentTrack(markPlayed);
 
+        if (m_state.repeatCurrent && m_currentIndex >= 0 && m_currentIndex < m_queue.size()) {
+            playCurrent();
+            return;
+        }
+
         if (m_currentIndex + 1 < m_queue.size()) {
             ++m_currentIndex;
             playCurrent();
@@ -265,6 +270,21 @@ void PlaybackController::setOutputDevice(const QString& deviceId)
     m_backend->setVolume(deviceVolume);
     emit stateChanged();
     emit audioDevicesChanged();
+}
+
+void PlaybackController::setRepeatCurrent(bool value)
+{
+    if (m_state.repeatCurrent == value) {
+        return;
+    }
+
+    m_state.repeatCurrent = value;
+    emit stateChanged();
+}
+
+void PlaybackController::toggleRepeatCurrent()
+{
+    setRepeatCurrent(!m_state.repeatCurrent);
 }
 
 void PlaybackController::setGaplessEnabled(bool value)

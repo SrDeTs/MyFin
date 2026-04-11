@@ -19,6 +19,7 @@ class PlaybackViewModel final : public QObject {
     Q_PROPERTY(bool hasTrack READ hasTrack NOTIFY stateChanged)
     Q_PROPERTY(bool canGoPrevious READ canGoPrevious NOTIFY stateChanged)
     Q_PROPERTY(bool canGoNext READ canGoNext NOTIFY stateChanged)
+    Q_PROPERTY(bool repeatCurrent READ repeatCurrent NOTIFY stateChanged)
     Q_PROPERTY(int queueLength READ queueLength NOTIFY stateChanged)
     Q_PROPERTY(qint64 positionMs READ positionMs NOTIFY stateChanged)
     Q_PROPERTY(qint64 durationMs READ durationMs NOTIFY stateChanged)
@@ -39,6 +40,7 @@ public:
     bool hasTrack() const;
     bool canGoPrevious() const;
     bool canGoNext() const;
+    bool repeatCurrent() const;
     int queueLength() const;
     qint64 positionMs() const;
     qint64 durationMs() const;
@@ -51,6 +53,7 @@ public:
     Q_INVOKABLE void next();
     Q_INVOKABLE void seek(qint64 positionMs);
     Q_INVOKABLE void setOutputVolume(float value);
+    Q_INVOKABLE void toggleRepeatCurrent();
 
 signals:
     void stateChanged();
