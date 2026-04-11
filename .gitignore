@@ -1,0 +1,37 @@
+# Diretórios de build
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/gen/
+pacotes/
+pkg/
+AppDir/
+build/
+cmake-build-*/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.user
+*.user.*
+CMakeUserPresets.json
+
+# Scripts
+PushParaGitHub.sh
+ReleasePraGithub.sh
+
+# Notas
+atualizações.md
+
+# Env
+.env
+.env.local
+
+# Qt / CMake
+.qmltc/
+.qt/
+moc_*
+qrc_*
+ui_*
+*.qmlc
+*.jsc
