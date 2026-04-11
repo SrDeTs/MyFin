@@ -104,12 +104,29 @@ bool LibraryViewModel::connected() const
 
 bool LibraryViewModel::hasTracks() const
 {
-    return !m_cachedTracks.isEmpty();
+    return !m_filteredTracks.isEmpty();
 }
 
 int LibraryViewModel::trackCount() const
 {
-    return m_cachedTracks.size();
+    return m_filteredTracks.size();
+}
+
+QString LibraryViewModel::searchQuery() const
+{
+    return m_searchQuery;
+}
+
+void LibraryViewModel::setSearchQuery(const QString& value)
+{
+    const QString trimmedValue = value.trimmed();
+    if (m_searchQuery == trimmedValue) {
+        return;
+    }
+
+    m_searchQuery = trimmedValue;
+    rebuildRows();
+    emit contentChanged();
 }
 
 QString LibraryViewModel::headlineTitle() const
@@ -166,9 +183,9 @@ void LibraryViewModel::reload()
 
 void LibraryViewModel::playTrack(const QString& trackId)
 {
-    for (qsizetype index = 0; index < m_cachedTracks.size(); ++index) {
-        if (m_cachedTracks.at(index).id == trackId) {
-            m_playback.playQueue(m_cachedTracks, static_cast<int>(index));
+    for (qsizetype index = 0; index < m_filteredTracks.size(); ++index) {
+        if (m_filteredTracks.at(index).id == trackId) {
+            m_playback.playQueue(m_filteredTracks, static_cast<int>(index));
             return;
         }
     }
@@ -186,10 +203,26 @@ QString LibraryViewModel::formatDuration(qint64 durationMs) const
 
 void LibraryViewModel::rebuildRows()
 {
-    QVector<Models::TrackRow> rows;
-    rows.reserve(m_cachedTracks.size());
+    const QString needle = m_searchQuery.trimmed();
+    const QString foldedNeedle = needle.toCaseFolded();
 
-    for (const Domain::Track& track : m_cachedTracks) {
+    m_filteredTracks.clear();
+    if (foldedNeedle.isEmpty()) {
+        m_filteredTracks = m_cachedTracks;
+    } else {
+        m_filteredTracks.reserve(m_cachedTracks.size());
+        for (const Domain::Track& track : m_cachedTracks) {
+            const QString haystack = (track.title + QLatin1Char(' ') + track.artist + QLatin1Char(' ') + track.album).toCaseFolded();
+            if (haystack.contains(foldedNeedle)) {
+                m_filteredTracks.push_back(track);
+            }
+        }
+    }
+
+    QVector<Models::TrackRow> rows;
+    rows.reserve(m_filteredTracks.size());
+
+    for (const Domain::Track& track : m_filteredTracks) {
         rows.push_back({
             track.id,
             track.title,

@@ -24,20 +24,26 @@ Item {
                 Layout.fillWidth: true
                 spacing: 14
 
-                ColumnLayout {
+                TextField {
                     Layout.fillWidth: true
-                    spacing: 2
+                    implicitHeight: 42
+                    text: appVm.library.searchQuery
+                    placeholderText: "Pesquisar musicas"
+                    color: theme.text
+                    placeholderTextColor: theme.textMuted
+                    leftPadding: 14
+                    rightPadding: 14
+                    topPadding: 0
+                    bottomPadding: 0
+                    verticalAlignment: TextInput.AlignVCenter
+                    selectByMouse: true
+                    onTextEdited: appVm.library.searchQuery = text
 
-                    Text {
-                        text: appVm.session.authenticated ? "Musicas" : "Musicas em cache"
-                        color: theme.text
-                        font.pixelSize: 22
-                        font.weight: Font.DemiBold
-                    }
-
-                    Item {
-                        Layout.fillWidth: true
-                        implicitHeight: 0
+                    background: Rectangle {
+                        radius: 14
+                        color: theme.panelRaised
+                        border.width: 1
+                        border.color: parent.activeFocus ? theme.accentStrong : theme.stroke
                     }
                 }
 
@@ -201,7 +207,11 @@ Item {
 
                         Text {
                             width: parent.width
-                            text: appVm.session.authenticated ? "Nenhuma musica carregada" : "Nenhuma biblioteca local disponivel"
+                            text: appVm.library.searchQuery.length > 0
+                                  ? "Nenhum resultado encontrado"
+                                  : appVm.session.authenticated
+                                    ? "Nenhuma musica carregada"
+                                    : "Nenhuma biblioteca local disponivel"
                             color: theme.text
                             font.pixelSize: 24
                             font.weight: Font.Bold
@@ -211,9 +221,11 @@ Item {
 
                         Text {
                             width: parent.width
-                            text: appVm.session.authenticated
-                                  ? "Atualize a biblioteca ou verifique se sua conta no Jellyfin tem permissao para acessar itens de audio."
-                                  : "Abra Configuracoes para conectar no Jellyfin e criar o primeiro snapshot local."
+                            text: appVm.library.searchQuery.length > 0
+                                  ? "Tente outro termo de busca."
+                                  : appVm.session.authenticated
+                                    ? "Atualize a biblioteca ou verifique se sua conta no Jellyfin tem permissao para acessar itens de audio."
+                                    : "Abra Configuracoes para conectar no Jellyfin e criar o primeiro snapshot local."
                             color: theme.textMuted
                             font.pixelSize: 14
                             horizontalAlignment: Text.AlignHCenter

@@ -25,6 +25,7 @@ class LibraryViewModel final : public QObject {
     Q_PROPERTY(bool connected READ connected NOTIFY connectedChanged)
     Q_PROPERTY(bool hasTracks READ hasTracks NOTIFY contentChanged)
     Q_PROPERTY(int trackCount READ trackCount NOTIFY contentChanged)
+    Q_PROPERTY(QString searchQuery READ searchQuery WRITE setSearchQuery NOTIFY contentChanged)
     Q_PROPERTY(QString headlineTitle READ headlineTitle NOTIFY contentChanged)
     Q_PROPERTY(QString headlineSubtitle READ headlineSubtitle NOTIFY contentChanged)
 
@@ -40,6 +41,8 @@ public:
     bool connected() const;
     bool hasTracks() const;
     int trackCount() const;
+    QString searchQuery() const;
+    void setSearchQuery(const QString& value);
     QString headlineTitle() const;
     QString headlineSubtitle() const;
 
@@ -61,8 +64,10 @@ private:
     Infrastructure::Playback::PlaybackController& m_playback;
     Models::TrackListModel m_tracks;
     QVector<Domain::Track> m_cachedTracks;
+    QVector<Domain::Track> m_filteredTracks;
     bool m_loading = false;
     QString m_statusMessage;
+    QString m_searchQuery;
 };
 
 }  // namespace MyFin::Presentation
