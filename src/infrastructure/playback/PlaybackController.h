@@ -71,6 +71,8 @@ signals:
 private:
     void playCurrent();
     void syncStateFromCurrent();
+    void scheduleQueuedTrack();
+    void advanceToQueuedTrack();
     void flushPlaybackProgress(bool paused);
     void stopCurrentTrack(bool markPlayed);
     bool completionReached() const;

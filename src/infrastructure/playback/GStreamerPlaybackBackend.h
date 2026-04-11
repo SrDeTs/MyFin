@@ -3,8 +3,10 @@
 #include "infrastructure/playback/IPlaybackBackend.h"
 
 #include <QHash>
+#include <QMutex>
 #include <QObject>
 #include <QString>
+#include <QUrl>
 #include <QVector>
 
 class QTimer;
@@ -29,6 +31,8 @@ public:
     void stop() override;
 
     void setVolume(float value);
+    void setQueuedSource(const QUrl& source);
+    void clearQueuedSource();
     float volume() const;
     void setPosition(qint64 positionMs);
     bool isPlaying() const;
@@ -49,6 +53,7 @@ signals:
     void positionChanged(qint64 positionMs);
     void durationChanged(qint64 durationMs);
     void mediaFinished();
+    void queuedSourceActivated();
     void errorOccurred(const QString& message);
     void outputDeviceChanged();
     void outputDevicesChanged();
@@ -60,6 +65,7 @@ private:
     };
 
     static void ensureGStreamerInitialized();
+    static void onAboutToFinish(GstElement* playbin, void* userData);
 
     void processBusMessages();
     void refreshOutputDevices();
@@ -86,6 +92,8 @@ private:
     int m_currentOutputChannelCount = 0;
     QString m_currentOutputSampleFormat = QStringLiteral("Desconhecido");
 
+    mutable QMutex m_queueMutex;
+    QString m_queuedSourceUri;
     qint64 m_lastPositionMs = 0;
     qint64 m_lastDurationMs = 0;
     bool m_isPlaying = false;

@@ -239,91 +239,143 @@ Item {
                             width: parent.width
                             spacing: 12
 
-                            RowLayout {
+                            Column {
                                 width: parent.width
-                                spacing: 14
+                                spacing: 8
 
-                                Text {
-                                    text: "ReplayGain"
-                                    color: theme.textMuted
-                                    font.pixelSize: 12
-                                    font.weight: Font.DemiBold
-                                    Layout.preferredWidth: 110
+                                RowLayout {
+                                    width: parent.width
+                                    spacing: 14
+
+                                    Text {
+                                        text: "ReplayGain"
+                                        color: theme.textMuted
+                                        font.pixelSize: 12
+                                        font.weight: Font.DemiBold
+                                        Layout.preferredWidth: 110
+                                    }
+
+                                    ComboBox {
+                                        Layout.fillWidth: true
+                                        model: appVm.audio.replayGainOptions
+                                        currentIndex: appVm.audio.replayGainIndex
+                                        onActivated: appVm.audio.setReplayGainIndex(currentIndex)
+                                    }
                                 }
 
-                                ComboBox {
-                                    Layout.fillWidth: true
-                                    model: appVm.audio.replayGainOptions
-                                    currentIndex: appVm.audio.replayGainIndex
-                                    onActivated: appVm.audio.setReplayGainIndex(currentIndex)
+                                Text {
+                                    width: parent.width
+                                    text: "Ajusta o volume percebido entre faixas para evitar saltos bruscos."
+                                    color: theme.textMuted
+                                    font.pixelSize: 12
+                                    wrapMode: Text.WordWrap
                                 }
                             }
 
-                            RowLayout {
+                            Column {
                                 width: parent.width
-                                spacing: 14
+                                spacing: 8
 
-                                Text {
-                                    text: "Gapless"
-                                    color: theme.textMuted
-                                    font.pixelSize: 12
-                                    font.weight: Font.DemiBold
-                                    Layout.preferredWidth: 110
+                                RowLayout {
+                                    width: parent.width
+                                    spacing: 14
+
+                                    Text {
+                                        text: "Gapless"
+                                        color: theme.textMuted
+                                        font.pixelSize: 12
+                                        font.weight: Font.DemiBold
+                                        Layout.preferredWidth: 110
+                                    }
+
+                                    Switch {
+                                        checked: appVm.audio.gaplessEnabled
+                                        onToggled: appVm.audio.gaplessEnabled = checked
+                                    }
                                 }
 
-                                Switch {
-                                    checked: appVm.audio.gaplessEnabled
-                                    onToggled: appVm.audio.gaplessEnabled = checked
+                                Text {
+                                    width: parent.width
+                                    text: "Tenta trocar para a proxima faixa sem silencio entre elas."
+                                    color: theme.textMuted
+                                    font.pixelSize: 12
+                                    wrapMode: Text.WordWrap
                                 }
                             }
 
-                            RowLayout {
+                            Column {
                                 width: parent.width
-                                spacing: 14
+                                spacing: 8
+
+                                RowLayout {
+                                    width: parent.width
+                                    spacing: 14
+
+                                    Text {
+                                        text: "Crossfade"
+                                        color: theme.textMuted
+                                        font.pixelSize: 12
+                                        font.weight: Font.DemiBold
+                                        Layout.preferredWidth: 110
+                                    }
+
+                                    Slider {
+                                        id: crossfadeSlider
+                                        Layout.fillWidth: true
+                                        from: 0
+                                        to: 12
+                                        stepSize: 1
+                                        value: appVm.audio.crossfadeSeconds
+                                        onMoved: appVm.audio.crossfadeSeconds = Math.round(value)
+                                    }
+
+                                    Text {
+                                        text: appVm.audio.crossfadeSeconds + "s"
+                                        color: theme.text
+                                        font.pixelSize: 13
+                                        font.weight: Font.DemiBold
+                                        Layout.preferredWidth: 36
+                                        horizontalAlignment: Text.AlignRight
+                                    }
+                                }
 
                                 Text {
-                                    text: "Crossfade"
+                                    width: parent.width
+                                    text: "Mistura o final de uma faixa com o inicio da proxima. Ainda nao implementado no motor."
                                     color: theme.textMuted
                                     font.pixelSize: 12
-                                    font.weight: Font.DemiBold
-                                    Layout.preferredWidth: 110
-                                }
-
-                                Slider {
-                                    id: crossfadeSlider
-                                    Layout.fillWidth: true
-                                    from: 0
-                                    to: 12
-                                    stepSize: 1
-                                    value: appVm.audio.crossfadeSeconds
-                                    onMoved: appVm.audio.crossfadeSeconds = Math.round(value)
-                                }
-
-                                Text {
-                                    text: appVm.audio.crossfadeSeconds + "s"
-                                    color: theme.text
-                                    font.pixelSize: 13
-                                    font.weight: Font.DemiBold
-                                    Layout.preferredWidth: 36
-                                    horizontalAlignment: Text.AlignRight
+                                    wrapMode: Text.WordWrap
                                 }
                             }
 
-                            RowLayout {
+                            Column {
                                 width: parent.width
-                                spacing: 14
+                                spacing: 8
 
-                                Text {
-                                    text: "Preload"
-                                    color: theme.textMuted
-                                    font.pixelSize: 12
-                                    font.weight: Font.DemiBold
-                                    Layout.preferredWidth: 110
+                                RowLayout {
+                                    width: parent.width
+                                    spacing: 14
+
+                                    Text {
+                                        text: "Preload"
+                                        color: theme.textMuted
+                                        font.pixelSize: 12
+                                        font.weight: Font.DemiBold
+                                        Layout.preferredWidth: 110
+                                    }
+
+                                    Switch {
+                                        checked: appVm.audio.preloadNextTrack
+                                        onToggled: appVm.audio.preloadNextTrack = checked
+                                    }
                                 }
 
-                                Switch {
-                                    checked: appVm.audio.preloadNextTrack
-                                    onToggled: appVm.audio.preloadNextTrack = checked
+                                Text {
+                                    width: parent.width
+                                    text: "Prepara a proxima faixa antes do fim da atual para reduzir atraso na troca."
+                                    color: theme.textMuted
+                                    font.pixelSize: 12
+                                    wrapMode: Text.WordWrap
                                 }
                             }
                         }

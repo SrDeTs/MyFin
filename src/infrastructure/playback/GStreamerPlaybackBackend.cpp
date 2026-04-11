@@ -2,6 +2,8 @@
 
 #include "infrastructure/logging/Logging.h"
 
+#include <QMetaObject>
+#include <QMutexLocker>
 #include <QTimer>
 
 #include <gst/gst.h>
@@ -234,6 +236,37 @@ void GStreamerPlaybackBackend::ensureGStreamerInitialized()
     });
 }
 
+void GStreamerPlaybackBackend::onAboutToFinish(GstElement* playbin, gpointer userData)
+{
+    Q_UNUSED(playbin)
+
+    auto* self = static_cast<GStreamerPlaybackBackend*>(userData);
+    if (self == nullptr) {
+        return;
+    }
+
+    QString queuedUri;
+    {
+        QMutexLocker locker(&self->m_queueMutex);
+        queuedUri = self->m_queuedSourceUri;
+        self->m_queuedSourceUri.clear();
+    }
+
+    if (queuedUri.isEmpty() || self->m_playbin == nullptr) {
+        return;
+    }
+
+    const QByteArray uriBytes = queuedUri.toUtf8();
+    g_object_set(G_OBJECT(self->m_playbin), "uri", uriBytes.constData(), nullptr);
+
+    QMetaObject::invokeMethod(self, [self] {
+        self->m_lastPositionMs = 0;
+        self->m_lastDurationMs = 0;
+        emit self->positionChanged(0);
+        emit self->queuedSourceActivated();
+    }, Qt::QueuedConnection);
+}
+
 GStreamerPlaybackBackend::GStreamerPlaybackBackend(QObject* parent)
     : QObject(parent)
     , m_playbin(nullptr)
@@ -254,6 +287,8 @@ GStreamerPlaybackBackend::GStreamerPlaybackBackend(QObject* parent)
         qCritical(lcPlayback) << "Failed to create GStreamer playbin";
         return;
     }
+
+    g_signal_connect(m_playbin, "about-to-finish", G_CALLBACK(&GStreamerPlaybackBackend::onAboutToFinish), this);
 
     m_bus = gst_element_get_bus(m_playbin);
     m_deviceMonitor = gst_device_monitor_new();
@@ -353,7 +388,9 @@ void GStreamerPlaybackBackend::stop()
         return;
     }
 
+    clearQueuedSource();
     gst_element_set_state(m_playbin, GST_STATE_NULL);
+    m_hasSource = false;
     if (m_isPlaying) {
         m_isPlaying = false;
         emit playingChanged();
@@ -367,6 +404,20 @@ void GStreamerPlaybackBackend::setVolume(float value)
     }
 
     g_object_set(G_OBJECT(m_playbin), "volume", qBound(0.0, static_cast<double>(value), 1.0), nullptr);
+}
+
+void GStreamerPlaybackBackend::setQueuedSource(const QUrl& source)
+{
+    QMutexLocker locker(&m_queueMutex);
+    m_queuedSourceUri = source.isValid() && !source.isEmpty()
+                            ? source.toString(QUrl::FullyEncoded)
+                            : QString();
+}
+
+void GStreamerPlaybackBackend::clearQueuedSource()
+{
+    QMutexLocker locker(&m_queueMutex);
+    m_queuedSourceUri.clear();
 }
 
 float GStreamerPlaybackBackend::volume() const
