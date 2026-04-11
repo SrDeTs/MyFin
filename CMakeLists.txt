@@ -101,6 +101,8 @@ qt_add_qml_module(myfin
         src/ui/qml/Main.qml
         src/ui/qml/theme/Theme.qml
         src/ui/qml/components/SidebarButton.qml
+        src/ui/qml/components/AppButton.qml
+        src/ui/qml/components/AppTextField.qml
         src/ui/qml/components/MiniPlayer.qml
         src/ui/qml/screens/HomeScreen.qml
         src/ui/qml/screens/SettingsScreen.qml

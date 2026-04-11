@@ -24,27 +24,12 @@ Item {
                 Layout.fillWidth: true
                 spacing: 14
 
-                TextField {
+                AppTextField {
                     Layout.fillWidth: true
-                    implicitHeight: 42
+                    theme: root.theme
                     text: appVm.library.searchQuery
                     placeholderText: "Pesquisar musicas"
-                    color: theme.text
-                    placeholderTextColor: theme.textMuted
-                    leftPadding: 14
-                    rightPadding: 14
-                    topPadding: 0
-                    bottomPadding: 0
-                    verticalAlignment: TextInput.AlignVCenter
-                    selectByMouse: true
                     onTextEdited: appVm.library.searchQuery = text
-
-                    background: Rectangle {
-                        radius: 14
-                        color: theme.panelRaised
-                        border.width: 1
-                        border.color: parent.activeFocus ? theme.accentStrong : theme.stroke
-                    }
                 }
 
                 Rectangle {
