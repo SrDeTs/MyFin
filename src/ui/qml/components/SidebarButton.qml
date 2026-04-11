@@ -26,16 +26,6 @@ Button {
         border.width: 1
         border.color: control.active ? control.theme.accent : "transparent"
 
-        Rectangle {
-            visible: control.active
-            width: 3
-            height: parent.height - 16
-            radius: 2
-            anchors.left: parent.left
-            anchors.leftMargin: 10
-            anchors.verticalCenter: parent.verticalCenter
-            color: control.theme.accentStrong
-        }
     }
 
     contentItem: Text {
@@ -44,7 +34,7 @@ Button {
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignLeft
         elide: Text.ElideRight
-        leftPadding: control.active ? 24 : 16
+        leftPadding: 16
         rightPadding: 14
         font: control.font
     }
