@@ -13,6 +13,8 @@
 #include <QNetworkRequest>
 #include <QTimer>
 #include <QUrlQuery>
+#include <functional>
+#include <memory>
 
 namespace MyFin::Infrastructure::Jellyfin {
 
@@ -346,50 +348,74 @@ void JellyfinApiClient::fetchHomeFeed(int limit)
     setLastError({});
     setState(ConnectionState::Syncing);
 
-    QUrlQuery query;
-    query.addQueryItem(QStringLiteral("userId"), m_serverProfile.userId);
-    query.addQueryItem(QStringLiteral("recursive"), QStringLiteral("true"));
-    query.addQueryItem(QStringLiteral("includeItemTypes"), QStringLiteral("Audio"));
-    query.addQueryItem(QStringLiteral("enableUserData"), QStringLiteral("true"));
-    query.addQueryItem(QStringLiteral("sortBy"), QStringLiteral("DateCreated"));
-    query.addQueryItem(QStringLiteral("sortOrder"), QStringLiteral("Descending"));
-    query.addQueryItem(QStringLiteral("limit"), QString::number(limit));
+    const int pageSize = qBound(100, limit, 500);
+    auto aggregatedTracks = std::make_shared<QVector<Domain::Track>>();
+    auto fetchPage = std::make_shared<std::function<void(int)>>();
 
-    beginRequest();
-    QNetworkReply* reply = m_network.get(buildRequest(QStringLiteral("/Items"), true, query));
-    connect(reply, &QNetworkReply::finished, this, [this, reply] {
-        const QByteArray body = reply->readAll();
-        const bool hasNetworkError = reply->error() != QNetworkReply::NoError;
-        const int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    *fetchPage = [this, pageSize, aggregatedTracks, fetchPage](int startIndex) {
+        QUrlQuery query;
+        query.addQueryItem(QStringLiteral("userId"), m_serverProfile.userId);
+        query.addQueryItem(QStringLiteral("recursive"), QStringLiteral("true"));
+        query.addQueryItem(QStringLiteral("includeItemTypes"), QStringLiteral("Audio"));
+        query.addQueryItem(QStringLiteral("enableUserData"), QStringLiteral("true"));
+        query.addQueryItem(QStringLiteral("sortBy"), QStringLiteral("DateCreated"));
+        query.addQueryItem(QStringLiteral("sortOrder"), QStringLiteral("Descending"));
+        query.addQueryItem(QStringLiteral("startIndex"), QString::number(startIndex));
+        query.addQueryItem(QStringLiteral("limit"), QString::number(pageSize));
 
-        endRequest();
-        reply->deleteLater();
+        beginRequest();
+        QNetworkReply* reply = m_network.get(buildRequest(QStringLiteral("/Items"), true, query));
+        connect(reply, &QNetworkReply::finished, this, [this, reply, startIndex, pageSize, aggregatedTracks, fetchPage] {
+            const QByteArray body = reply->readAll();
+            const bool hasNetworkError = reply->error() != QNetworkReply::NoError;
+            const int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 
-        if (hasNetworkError || statusCode >= 400) {
-            const QString error = responseErrorMessage(reply, body, QStringLiteral("Failed to load the Jellyfin library."));
-            qWarning(lcJellyfin) << "Home feed request failed:" << error;
-            if (statusCode == 401) {
-                qWarning(lcJellyfin) << "Cached Jellyfin session is no longer valid; clearing the persisted token";
-                logout();
+            endRequest();
+            reply->deleteLater();
+
+            if (hasNetworkError || statusCode >= 400) {
+                const QString error = responseErrorMessage(reply, body, QStringLiteral("Failed to load the Jellyfin library."));
+                qWarning(lcJellyfin) << "Home feed request failed:" << error;
+                if (statusCode == 401) {
+                    qWarning(lcJellyfin) << "Cached Jellyfin session is no longer valid; clearing the persisted token";
+                    logout();
+                    setLastError(error);
+                    emit requestFailed(error);
+                    return;
+                }
+                setState(ConnectionState::Connected);
                 setLastError(error);
                 emit requestFailed(error);
                 return;
             }
+
+            const QJsonDocument document = QJsonDocument::fromJson(body);
+            const QJsonObject root = document.object();
+            const QVector<Domain::Track> pageTracks = parseTracks(root.value(QStringLiteral("Items")).toArray());
+            const int totalRecordCount = root.value(QStringLiteral("TotalRecordCount")).toInt(-1);
+
+            aggregatedTracks->reserve(aggregatedTracks->size() + pageTracks.size());
+            for (const Domain::Track& track : pageTracks) {
+                aggregatedTracks->push_back(track);
+            }
+
+            const bool reachedKnownEnd = totalRecordCount >= 0 && aggregatedTracks->size() >= totalRecordCount;
+            const bool reachedShortPage = pageTracks.size() < pageSize;
+            if (!pageTracks.isEmpty() && !reachedKnownEnd && !reachedShortPage) {
+                (*fetchPage)(startIndex + pageTracks.size());
+                return;
+            }
+
+            m_homeTracks = *aggregatedTracks;
+            m_libraryCache.saveHomeTracks(m_homeTracks);
+
+            qInfo(lcJellyfin) << "Fetched" << m_homeTracks.size() << "tracks from Jellyfin";
             setState(ConnectionState::Connected);
-            setLastError(error);
-            emit requestFailed(error);
-            return;
-        }
+            emit homeFeedReady();
+        });
+    };
 
-        const QJsonDocument document = QJsonDocument::fromJson(body);
-        const QJsonObject root = document.object();
-        m_homeTracks = parseTracks(root.value(QStringLiteral("Items")).toArray());
-        m_libraryCache.saveHomeTracks(m_homeTracks);
-
-        qInfo(lcJellyfin) << "Fetched" << m_homeTracks.size() << "tracks from Jellyfin";
-        setState(ConnectionState::Connected);
-        emit homeFeedReady();
-    });
+    (*fetchPage)(0);
 }
 
 QUrl JellyfinApiClient::normalizeServerUrl(const QString& value)

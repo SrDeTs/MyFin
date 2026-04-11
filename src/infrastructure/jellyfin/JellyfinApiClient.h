@@ -63,7 +63,7 @@ public:
 
     Q_INVOKABLE void login(const QString& serverUrl, const QString& username, const QString& password);
     Q_INVOKABLE void logout();
-    Q_INVOKABLE void fetchHomeFeed(int limit = 100);
+    Q_INVOKABLE void fetchHomeFeed(int limit = 500);
 
 signals:
     void homeFeedReady();

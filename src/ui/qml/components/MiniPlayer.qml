@@ -70,23 +70,6 @@ Rectangle {
             }
         }
 
-        Rectangle {
-            Layout.preferredWidth: 160
-            Layout.preferredHeight: 34
-            radius: 12
-            color: theme.panelRaised
-            border.width: 1
-            border.color: theme.stroke
-
-            Text {
-                anchors.centerIn: parent
-                text: playback.hasTrack ? playback.signalPath : "Aguardando reprodução"
-                color: theme.accentStrong
-                font.pixelSize: 11
-                font.weight: Font.DemiBold
-            }
-        }
-
         RowLayout {
             spacing: 10
 
