@@ -2,7 +2,7 @@
 
 #include "infrastructure/jellyfin/JellyfinApiClient.h"
 #include "infrastructure/logging/Logging.h"
-#include "infrastructure/playback/QtMediaPlaybackBackend.h"
+#include "infrastructure/playback/GStreamerPlaybackBackend.h"
 #include "infrastructure/settings/SettingsService.h"
 
 #include <QTimer>
@@ -22,7 +22,7 @@ PlaybackController::PlaybackController(Infrastructure::Jellyfin::JellyfinApiClie
     : QObject(parent)
     , m_jellyfin(jellyfin)
     , m_settings(settings)
-    , m_backend(new QtMediaPlaybackBackend(this))
+    , m_backend(new GStreamerPlaybackBackend(this))
     , m_progressTimer(new QTimer(this))
 {
     const QString preferredDeviceId = settings.preferredAudioDeviceId();
@@ -39,24 +39,24 @@ PlaybackController::PlaybackController(Infrastructure::Jellyfin::JellyfinApiClie
         flushPlaybackProgress(false);
     });
 
-    connect(m_backend, &QtMediaPlaybackBackend::playingChanged, this, [this] {
+    connect(m_backend, &GStreamerPlaybackBackend::playingChanged, this, [this] {
         m_state.playing = m_backend->isPlaying();
         emit stateChanged();
     });
 
-    connect(m_backend, &QtMediaPlaybackBackend::positionChanged, this, [this](qint64 positionMs) {
+    connect(m_backend, &GStreamerPlaybackBackend::positionChanged, this, [this](qint64 positionMs) {
         m_state.positionMs = positionMs;
         emit stateChanged();
     });
 
-    connect(m_backend, &QtMediaPlaybackBackend::durationChanged, this, [this](qint64 durationMs) {
+    connect(m_backend, &GStreamerPlaybackBackend::durationChanged, this, [this](qint64 durationMs) {
         if (durationMs > 0) {
             m_state.durationMs = durationMs;
             emit stateChanged();
         }
     });
 
-    connect(m_backend, &QtMediaPlaybackBackend::mediaFinished, this, [this] {
+    connect(m_backend, &GStreamerPlaybackBackend::mediaFinished, this, [this] {
         const bool markPlayed = completionReached();
         stopCurrentTrack(markPlayed);
 
@@ -73,7 +73,7 @@ PlaybackController::PlaybackController(Infrastructure::Jellyfin::JellyfinApiClie
         emit stateChanged();
     });
 
-    connect(m_backend, &QtMediaPlaybackBackend::errorOccurred, this, [this](const QString& message) {
+    connect(m_backend, &GStreamerPlaybackBackend::errorOccurred, this, [this](const QString& message) {
         m_progressTimer->stop();
         stopCurrentTrack(false);
         m_state.errorText = message;
@@ -81,7 +81,7 @@ PlaybackController::PlaybackController(Infrastructure::Jellyfin::JellyfinApiClie
         emit stateChanged();
     });
 
-    connect(m_backend, &QtMediaPlaybackBackend::outputDeviceChanged, this, [this] {
+    connect(m_backend, &GStreamerPlaybackBackend::outputDeviceChanged, this, [this] {
         m_settings.setPreferredAudioDeviceId(m_backend->currentOutputDeviceId());
         const float deviceVolume = m_settings.outputVolumeForDevice(m_backend->currentOutputDeviceId(), m_settings.outputVolume());
         m_backend->setVolume(deviceVolume);
@@ -89,7 +89,7 @@ PlaybackController::PlaybackController(Infrastructure::Jellyfin::JellyfinApiClie
         emit audioDevicesChanged();
     });
 
-    connect(m_backend, &QtMediaPlaybackBackend::outputDevicesChanged, this, [this] {
+    connect(m_backend, &GStreamerPlaybackBackend::outputDevicesChanged, this, [this] {
         const QString preferredDeviceId = m_settings.preferredAudioDeviceId();
         if (!preferredDeviceId.isEmpty()) {
             m_backend->setOutputDeviceById(preferredDeviceId);
@@ -360,13 +360,11 @@ void PlaybackController::stopCurrentTrack(bool markPlayed)
 
 bool PlaybackController::completionReached() const
 {
-    const qint64 durationMs = m_state.durationMs > 0 ? m_state.durationMs : m_backend->duration();
-    const qint64 positionMs = m_state.positionMs > 0 ? m_state.positionMs : m_backend->position();
-    if (durationMs <= 0) {
+    if (m_state.durationMs <= 0) {
         return false;
     }
 
-    return positionMs >= durationMs - 2000 || positionMs >= (durationMs * 9) / 10;
+    return m_state.positionMs >= m_state.durationMs - 1500;
 }
 
 }  // namespace MyFin::Infrastructure::Playback

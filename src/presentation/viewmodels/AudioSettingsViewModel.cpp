@@ -16,7 +16,7 @@ namespace {
 QString sampleRateLabel(int sampleRate)
 {
     return sampleRate > 0 ? QStringLiteral("%1 kHz").arg(sampleRate / 1000.0, 0, 'f', sampleRate % 1000 == 0 ? 0 : 1)
-                          : QStringLiteral("Desconhecido");
+                          : QStringLiteral("Aguardando stream");
 }
 
 QString channelLabel(int channels)
@@ -93,7 +93,11 @@ QString AudioSettingsViewModel::outputFormatSummary() const
 
 QString AudioSettingsViewModel::signalConfidence() const
 {
-    return QStringLiteral("Saida compartilhada via %1").arg(backendName());
+    if (!m_playback.state().trackId.isEmpty() && m_playback.currentOutputSampleRate() > 0) {
+        return QStringLiteral("Formato negociado em runtime via %1").arg(backendName());
+    }
+
+    return QStringLiteral("Device dedicado via %1").arg(backendName());
 }
 
 QString AudioSettingsViewModel::signalPath() const
@@ -117,8 +121,9 @@ QStringList AudioSettingsViewModel::qualityProfileOptions() const
 
 int AudioSettingsViewModel::qualityProfileIndex() const
 {
+    const QString current = qualityProfileLabel(m_settings.audioQualityProfile());
     const QStringList options = kQualityProfiles();
-    return options.indexOf(qualityProfileLabel(m_settings.audioQualityProfile()));
+    return options.indexOf(current);
 }
 
 bool AudioSettingsViewModel::advancedMode() const
@@ -133,8 +138,9 @@ QStringList AudioSettingsViewModel::replayGainOptions() const
 
 int AudioSettingsViewModel::replayGainIndex() const
 {
+    const QString current = replayGainLabel(m_settings.replayGainMode());
     const QStringList options = kReplayGainModes();
-    return options.indexOf(replayGainLabel(m_settings.replayGainMode()));
+    return options.indexOf(current);
 }
 
 bool AudioSettingsViewModel::gaplessEnabled() const

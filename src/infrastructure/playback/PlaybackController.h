@@ -1,7 +1,7 @@
 #pragma once
 
 #include "domain/entities/Track.h"
-#include "infrastructure/playback/QtMediaPlaybackBackend.h"
+#include "infrastructure/playback/GStreamerPlaybackBackend.h"
 
 #include <QObject>
 #include <QVector>
@@ -77,7 +77,7 @@ private:
 
     Infrastructure::Jellyfin::JellyfinApiClient& m_jellyfin;
     Infrastructure::Settings::SettingsService& m_settings;
-    QtMediaPlaybackBackend* m_backend = nullptr;
+    GStreamerPlaybackBackend* m_backend = nullptr;
     QTimer* m_progressTimer = nullptr;
     QVector<Domain::Track> m_queue;
     int m_currentIndex = -1;

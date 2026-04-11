@@ -11,15 +11,6 @@ class QMediaPlayer;
 
 namespace MyFin::Infrastructure::Playback {
 
-struct AudioOutputInfo {
-    QString id;
-    QString name;
-    int preferredSampleRate = 0;
-    int preferredChannelCount = 0;
-    QString preferredSampleFormat;
-    bool isDefault = false;
-};
-
 class QtMediaPlaybackBackend final : public QObject, public IPlaybackBackend {
     Q_OBJECT
 
