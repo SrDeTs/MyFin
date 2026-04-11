@@ -156,21 +156,64 @@ Rectangle {
                     bottomPadding: 0
 
                     background: Rectangle {
-                        implicitWidth: 50
-                        implicitHeight: 50
-                        radius: 25
+                        implicitWidth: 58
+                        implicitHeight: 58
+                        radius: 29
                         color: root.controlBgColor(playButton.enabled, true, playButton.hovered)
                         border.width: 1
                         border.color: theme.stroke
                     }
 
-                    contentItem: Text {
-                        text: playback.playing ? "\u23F8" : "\u25B6"
-                        color: root.controlFgColor(playButton.enabled, true)
-                        font.pixelSize: playback.playing ? 17 : 19
-                        font.weight: Font.Black
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+                    contentItem: Item {
+                        implicitWidth: 28
+                        implicitHeight: 28
+
+                        Canvas {
+                            id: playGlyph
+                            anchors.centerIn: parent
+                            width: 24
+                            height: 24
+                            visible: !playback.playing
+
+                            onPaint: {
+                                const ctx = getContext("2d")
+                                ctx.reset()
+                                ctx.fillStyle = playButton.enabled ? theme.panelMuted : theme.textMuted
+                                ctx.beginPath()
+                                ctx.moveTo(6, 3)
+                                ctx.lineTo(20, 12)
+                                ctx.lineTo(6, 21)
+                                ctx.closePath()
+                                ctx.fill()
+                            }
+
+                            Component.onCompleted: requestPaint()
+                            onVisibleChanged: requestPaint()
+                            Connections {
+                                target: playButton
+                                function onEnabledChanged() { playGlyph.requestPaint() }
+                            }
+                        }
+
+                        Row {
+                            anchors.centerIn: parent
+                            spacing: 5
+                            visible: playback.playing
+
+                            Rectangle {
+                                width: 5
+                                height: 18
+                                radius: 1
+                                color: playButton.enabled ? theme.panelMuted : theme.textMuted
+                            }
+
+                            Rectangle {
+                                width: 5
+                                height: 18
+                                radius: 1
+                                color: playButton.enabled ? theme.panelMuted : theme.textMuted
+                            }
+                        }
                     }
                 }
 
