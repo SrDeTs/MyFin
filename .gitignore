@@ -10,6 +10,7 @@ build/
 cmake-build-*/
 
 # IDE / Editor
+.codex
 .vscode/
 .idea/
 *.user
