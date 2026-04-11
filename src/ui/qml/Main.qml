@@ -25,7 +25,7 @@ ApplicationWindow {
         spacing: 18
 
         Rectangle {
-            Layout.preferredWidth: 198
+            Layout.preferredWidth: 172
             Layout.fillHeight: true
             radius: theme.radiusLarge
             color: theme.panel
@@ -34,32 +34,44 @@ ApplicationWindow {
 
             ColumnLayout {
                 anchors.fill: parent
-                anchors.margins: 18
-                spacing: 18
+                anchors.margins: 14
+                spacing: 16
 
-                ColumnLayout {
-                    spacing: 0
+                Rectangle {
+                    Layout.fillWidth: true
+                    radius: 18
+                    color: theme.panelMuted
+                    border.width: 1
+                    border.color: theme.stroke
+                    implicitHeight: 72
 
                     Text {
+                        anchors.left: parent.left
+                        anchors.leftMargin: 16
+                        anchors.verticalCenter: parent.verticalCenter
                         text: "MYFIN"
                         color: theme.text
-                        font.pixelSize: 29
-                        font.letterSpacing: 2
+                        font.pixelSize: 23
+                        font.letterSpacing: 1.4
                         font.weight: Font.Black
                     }
                 }
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: 8
+                    spacing: 6
 
                     SidebarButton {
+                        Layout.fillWidth: true
+                        theme: theme
                         text: "Musicas"
                         active: window.currentSection === "musicas"
                         onClicked: window.currentSection = "musicas"
                     }
 
                     SidebarButton {
+                        Layout.fillWidth: true
+                        theme: theme
                         text: "Configuracoes"
                         active: window.currentSection === "configuracoes"
                         onClicked: window.currentSection = "configuracoes"
