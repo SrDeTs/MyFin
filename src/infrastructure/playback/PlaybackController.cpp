@@ -282,6 +282,7 @@ void PlaybackController::playCurrent()
         return;
     }
 
+    m_backend->stop();
     m_playSessionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
     m_backend->setSource(streamUrl);
     m_backend->play();
@@ -341,20 +342,29 @@ void PlaybackController::flushPlaybackProgress(bool paused)
 
 void PlaybackController::stopCurrentTrack(bool markPlayed)
 {
-    if (m_currentIndex < 0 || m_currentIndex >= m_queue.size() || m_playSessionId.isEmpty()) {
+    m_progressTimer->stop();
+
+    if (m_currentIndex < 0 || m_currentIndex >= m_queue.size()) {
+        m_backend->stop();
+        m_playSessionId.clear();
         return;
     }
 
-    m_progressTimer->stop();
-    flushPlaybackProgress(!m_backend->isPlaying());
+    const qint64 lastPositionMs = m_backend->position();
+    m_state.positionMs = lastPositionMs;
 
-    const Domain::Track& track = m_queue.at(m_currentIndex);
-    m_state.positionMs = m_backend->position();
-    m_jellyfin.reportPlaybackStopped(track.id, m_playSessionId, m_state.positionMs);
-    if (markPlayed || completionReached()) {
-        m_jellyfin.markTrackPlayed(track.id);
+    if (!m_playSessionId.isEmpty()) {
+        flushPlaybackProgress(!m_backend->isPlaying());
+
+        const Domain::Track& track = m_queue.at(m_currentIndex);
+        m_jellyfin.reportPlaybackStopped(track.id, m_playSessionId, m_state.positionMs);
+        if (markPlayed || completionReached()) {
+            m_jellyfin.markTrackPlayed(track.id);
+        }
     }
 
+    m_backend->stop();
+    m_state.playing = false;
     m_playSessionId.clear();
 }
 

@@ -202,7 +202,7 @@ void AudioSettingsViewModel::setQualityProfileIndex(int index)
         m_settings.setGaplessEnabled(true);
         m_settings.setCrossfadeSeconds(0);
         m_settings.setPreloadNextTrack(true);
-        m_settings.setReplayGainMode(QStringLiteral("album"));
+        m_settings.setReplayGainMode(QStringLiteral("track"));
         m_settings.setStreamCacheLimitMb(512);
     } else if (key == QStringLiteral("balanced")) {
         m_settings.setGaplessEnabled(true);
@@ -309,7 +309,6 @@ QStringList AudioSettingsViewModel::kReplayGainModes()
     return {
         QStringLiteral("Desligado"),
         QStringLiteral("Por faixa"),
-        QStringLiteral("Por album"),
     };
 }
 
@@ -323,8 +322,7 @@ QString AudioSettingsViewModel::qualityProfileLabel(const QString& key)
 
 QString AudioSettingsViewModel::replayGainLabel(const QString& key)
 {
-    if (key == QStringLiteral("track")) return kReplayGainModes().at(1);
-    if (key == QStringLiteral("album")) return kReplayGainModes().at(2);
+    if (key == QStringLiteral("track") || key == QStringLiteral("album")) return kReplayGainModes().at(1);
     return kReplayGainModes().at(0);
 }
 
@@ -344,7 +342,6 @@ QString AudioSettingsViewModel::replayGainKeyForIndex(int index)
     switch (index) {
     case 0: return QStringLiteral("off");
     case 1: return QStringLiteral("track");
-    case 2: return QStringLiteral("album");
     default: return {};
     }
 }
