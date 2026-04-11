@@ -1,5 +1,6 @@
 #pragma once
 
+#include "presentation/viewmodels/AudioSettingsViewModel.h"
 #include "presentation/viewmodels/LibraryViewModel.h"
 #include "presentation/viewmodels/PlaybackViewModel.h"
 #include "presentation/viewmodels/SessionViewModel.h"
@@ -17,6 +18,7 @@ class AppRootViewModel final : public QObject {
     Q_PROPERTY(MyFin::Presentation::LibraryViewModel* library READ library CONSTANT FINAL)
     Q_PROPERTY(MyFin::Presentation::PlaybackViewModel* playback READ playback CONSTANT FINAL)
     Q_PROPERTY(MyFin::Presentation::SessionViewModel* session READ session CONSTANT FINAL)
+    Q_PROPERTY(MyFin::Presentation::AudioSettingsViewModel* audio READ audio CONSTANT FINAL)
     Q_PROPERTY(QString windowTitle READ windowTitle NOTIFY windowTitleChanged)
 
 public:
@@ -26,6 +28,7 @@ public:
     LibraryViewModel* library();
     PlaybackViewModel* playback();
     SessionViewModel* session();
+    AudioSettingsViewModel* audio();
     QString windowTitle() const;
 
     Q_INVOKABLE void bootstrap();
@@ -39,6 +42,7 @@ private:
     LibraryViewModel* m_library = nullptr;
     PlaybackViewModel* m_playback = nullptr;
     SessionViewModel* m_session = nullptr;
+    AudioSettingsViewModel* m_audio = nullptr;
     QString m_windowTitle = QStringLiteral("MyFin");
 };
 

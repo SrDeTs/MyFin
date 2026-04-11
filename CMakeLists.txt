@@ -67,6 +67,8 @@ set(MYFIN_SOURCES
     src/presentation/models/TrackListModel.cpp
     src/presentation/viewmodels/LibraryViewModel.h
     src/presentation/viewmodels/LibraryViewModel.cpp
+    src/presentation/viewmodels/AudioSettingsViewModel.h
+    src/presentation/viewmodels/AudioSettingsViewModel.cpp
     src/presentation/viewmodels/PlaybackViewModel.h
     src/presentation/viewmodels/PlaybackViewModel.cpp
     src/presentation/viewmodels/SessionViewModel.h

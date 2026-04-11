@@ -1,6 +1,7 @@
 #pragma once
 
 #include "domain/entities/Track.h"
+#include "infrastructure/playback/QtMediaPlaybackBackend.h"
 
 #include <QObject>
 #include <QVector>
@@ -16,8 +17,6 @@ class SettingsService;
 }
 
 namespace MyFin::Infrastructure::Playback {
-
-class QtMediaPlaybackBackend;
 
 class PlaybackController final : public QObject {
     Q_OBJECT
@@ -50,15 +49,24 @@ public:
     bool hasPrevious() const;
     bool hasNext() const;
     float outputVolume() const;
+    QVector<AudioOutputInfo> outputDevices() const;
+    QString currentOutputDeviceId() const;
+    QString currentOutputDeviceName() const;
+    int currentOutputSampleRate() const;
+    int currentOutputChannelCount() const;
+    QString currentOutputSampleFormat() const;
+    QString backendName() const;
 
     Q_INVOKABLE void togglePlaying();
     Q_INVOKABLE void previous();
     Q_INVOKABLE void next();
     Q_INVOKABLE void seek(qint64 positionMs);
     Q_INVOKABLE void setOutputVolume(float value);
+    Q_INVOKABLE void setOutputDevice(const QString& deviceId);
 
 signals:
     void stateChanged();
+    void audioDevicesChanged();
 
 private:
     void playCurrent();

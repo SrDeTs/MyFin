@@ -33,8 +33,34 @@ public:
     QString deviceId() const;
     void setDeviceId(const QString& value);
 
+    QString preferredAudioDeviceId() const;
+    void setPreferredAudioDeviceId(const QString& value);
+
     float outputVolume() const;
     void setOutputVolume(float value);
+    float outputVolumeForDevice(const QString& deviceId, float fallbackValue) const;
+    void setOutputVolumeForDevice(const QString& deviceId, float value);
+
+    QString audioQualityProfile() const;
+    void setAudioQualityProfile(const QString& value);
+
+    QString replayGainMode() const;
+    void setReplayGainMode(const QString& value);
+
+    bool gaplessEnabled() const;
+    void setGaplessEnabled(bool value);
+
+    int crossfadeSeconds() const;
+    void setCrossfadeSeconds(int value);
+
+    bool preloadNextTrack() const;
+    void setPreloadNextTrack(bool value);
+
+    int streamCacheLimitMb() const;
+    void setStreamCacheLimitMb(int value);
+
+    bool audioAdvancedMode() const;
+    void setAudioAdvancedMode(bool value);
 
     QSize windowSize() const;
     void setWindowSize(const QSize& value);

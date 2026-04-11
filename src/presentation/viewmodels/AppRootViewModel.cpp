@@ -1,6 +1,7 @@
 #include "presentation/viewmodels/AppRootViewModel.h"
 
 #include "app/AppServices.h"
+#include "presentation/viewmodels/AudioSettingsViewModel.h"
 #include "presentation/viewmodels/LibraryViewModel.h"
 #include "presentation/viewmodels/PlaybackViewModel.h"
 #include "presentation/viewmodels/SessionViewModel.h"
@@ -13,6 +14,7 @@ AppRootViewModel::AppRootViewModel(App::AppServices& services, QObject* parent)
     , m_library(new LibraryViewModel(m_services.jellyfin(), m_services.playback(), this))
     , m_playback(new PlaybackViewModel(m_services.playback(), this))
     , m_session(new SessionViewModel(m_services.jellyfin(), m_services.settings(), this))
+    , m_audio(new AudioSettingsViewModel(m_services.playback(), m_services.settings(), m_services.paths(), *m_library, this))
 {
     connect(m_playback, &PlaybackViewModel::stateChanged, this, [this] {
         if (m_playback->hasTrack()) {
@@ -39,6 +41,11 @@ PlaybackViewModel* AppRootViewModel::playback()
 SessionViewModel* AppRootViewModel::session()
 {
     return m_session;
+}
+
+AudioSettingsViewModel* AppRootViewModel::audio()
+{
+    return m_audio;
 }
 
 QString AppRootViewModel::windowTitle() const

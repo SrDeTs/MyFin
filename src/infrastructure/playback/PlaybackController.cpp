@@ -25,7 +25,14 @@ PlaybackController::PlaybackController(Infrastructure::Jellyfin::JellyfinApiClie
     , m_backend(new QtMediaPlaybackBackend(this))
     , m_progressTimer(new QTimer(this))
 {
-    m_backend->setVolume(settings.outputVolume());
+    const QString preferredDeviceId = settings.preferredAudioDeviceId();
+    if (!preferredDeviceId.isEmpty()) {
+        m_backend->setOutputDeviceById(preferredDeviceId);
+    }
+
+    const QString currentDeviceId = m_backend->currentOutputDeviceId();
+    const float initialVolume = settings.outputVolumeForDevice(currentDeviceId, settings.outputVolume());
+    m_backend->setVolume(initialVolume);
     m_progressTimer->setInterval(kPlaybackProgressIntervalMs);
 
     connect(m_progressTimer, &QTimer::timeout, this, [this] {
@@ -73,6 +80,23 @@ PlaybackController::PlaybackController(Infrastructure::Jellyfin::JellyfinApiClie
         m_state.playing = false;
         emit stateChanged();
     });
+
+    connect(m_backend, &QtMediaPlaybackBackend::outputDeviceChanged, this, [this] {
+        m_settings.setPreferredAudioDeviceId(m_backend->currentOutputDeviceId());
+        const float deviceVolume = m_settings.outputVolumeForDevice(m_backend->currentOutputDeviceId(), m_settings.outputVolume());
+        m_backend->setVolume(deviceVolume);
+        emit stateChanged();
+        emit audioDevicesChanged();
+    });
+
+    connect(m_backend, &QtMediaPlaybackBackend::outputDevicesChanged, this, [this] {
+        const QString preferredDeviceId = m_settings.preferredAudioDeviceId();
+        if (!preferredDeviceId.isEmpty()) {
+            m_backend->setOutputDeviceById(preferredDeviceId);
+        }
+        emit stateChanged();
+        emit audioDevicesChanged();
+    });
 }
 
 const PlaybackController::State& PlaybackController::state() const
@@ -117,7 +141,42 @@ bool PlaybackController::hasNext() const
 
 float PlaybackController::outputVolume() const
 {
-    return m_settings.outputVolume();
+    return m_backend->volume();
+}
+
+QVector<AudioOutputInfo> PlaybackController::outputDevices() const
+{
+    return m_backend->outputDevices();
+}
+
+QString PlaybackController::currentOutputDeviceId() const
+{
+    return m_backend->currentOutputDeviceId();
+}
+
+QString PlaybackController::currentOutputDeviceName() const
+{
+    return m_backend->currentOutputDeviceName();
+}
+
+int PlaybackController::currentOutputSampleRate() const
+{
+    return m_backend->currentOutputSampleRate();
+}
+
+int PlaybackController::currentOutputChannelCount() const
+{
+    return m_backend->currentOutputChannelCount();
+}
+
+QString PlaybackController::currentOutputSampleFormat() const
+{
+    return m_backend->currentOutputSampleFormat();
+}
+
+QString PlaybackController::backendName() const
+{
+    return m_backend->backendName();
 }
 
 void PlaybackController::togglePlaying()
@@ -184,8 +243,28 @@ void PlaybackController::setOutputVolume(float value)
 {
     const float clampedVolume = qBound(0.0F, value, 1.0F);
     m_settings.setOutputVolume(clampedVolume);
+    m_settings.setOutputVolumeForDevice(m_backend->currentOutputDeviceId(), clampedVolume);
     m_backend->setVolume(clampedVolume);
     emit stateChanged();
+}
+
+void PlaybackController::setOutputDevice(const QString& deviceId)
+{
+    const QString previousDeviceId = m_backend->currentOutputDeviceId();
+    if (!previousDeviceId.isEmpty()) {
+        m_settings.setOutputVolumeForDevice(previousDeviceId, m_backend->volume());
+    }
+
+    if (!m_backend->setOutputDeviceById(deviceId)) {
+        return;
+    }
+
+    const QString currentDeviceId = m_backend->currentOutputDeviceId();
+    m_settings.setPreferredAudioDeviceId(currentDeviceId);
+    const float deviceVolume = m_settings.outputVolumeForDevice(currentDeviceId, m_settings.outputVolume());
+    m_backend->setVolume(deviceVolume);
+    emit stateChanged();
+    emit audioDevicesChanged();
 }
 
 void PlaybackController::playCurrent()
